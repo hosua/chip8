@@ -20,23 +20,9 @@ using std::endl;
 using std::string;
 
 
-std::ifstream::pos_type GetFilesize(const char* filename){
-	std::ifstream file_stream(filename, std::ifstream::ate | std::ifstream::binary);
-	return file_stream.tellg();
-}
-
-// https://stackoverflow.com/questions/15138785/how-to-read-a-file-into-vector-in-c
-std::vector<uint8_t> GetROMData(const char* rom_file){
-	size_t rom_size = GetFilesize(rom_file);
-	std::ifstream file_stream(rom_file, std::ios::in | std::ios::binary);
-	std::istream_iterator<uint8_t> start(file_stream), end;
-	std::vector<uint8_t> rom_data(start, end);
-	return rom_data;
-}
-
 
 // Note that KK is synonymous with NN
-namespace Opcode {
+namespace Op {
 	enum { CLS, RET, SYS, JP, CALL, 
 			SE, SNE, LD, ADD, LDR, 
 			OR, AND, XOR, SUB, SHR, 
@@ -96,6 +82,20 @@ class Chip8 {
 public:
 	uint8_t mem[MEM_SIZE] = {0};
 
+	std::ifstream::pos_type GetFilesize(const char* filename){
+		std::ifstream file_stream(filename, std::ifstream::ate | std::ifstream::binary);
+		return file_stream.tellg();
+	}
+
+	// https://stackoverflow.com/questions/15138785/how-to-read-a-file-into-vector-in-c
+	std::vector<uint8_t> GetROMData(const char* rom_file){
+		size_t rom_size = GetFilesize(rom_file);
+		std::ifstream file_stream(rom_file, std::ios::in | std::ios::binary);
+		std::istream_iterator<uint8_t> start(file_stream), end;
+		std::vector<uint8_t> rom_data(start, end);
+		return rom_data;
+	}
+
 	void LoadRom(const char* rom_file){
 		std::vector<uint8_t> rom_data;
 		// Get length of file 
@@ -110,7 +110,7 @@ public:
 		for (int i = 0; i < rom_size; i++){
 			this->mem[0x200 + i] = rom_data[i];
 		}
-
+		printf("Rom \"%s\" loaded into memory\n", rom_file);
 	}
 
 };
@@ -135,38 +135,90 @@ public:
 		// Get the next opcode (read 16 bits)
 		uint16_t opcode = memory[this->pc] << 8 | memory[this->pc + 1];
 
-		uint16_t op = decode(opcode);
-		const char* opstr = Opcode::optostring(op);
-		printf("0x%04x: 0x%04x %s\n", this->pc, opcode, opstr);
-
 		// Increment to next opcode
 	 	this->pc += 2;
 
-		size_t x = Opcode::x(op);
-		size_t y = Opcode::y(op);
-		uint8_t kk = Opcode::kk(op);
-		// Perform CPU instructions
-		uint16_t nnn;
-		// Our actual operations
+		operate(opcode);
+	}
+
+	// Perform CPU instructions
+	void operate(uint16_t opcode){
+		uint16_t op = decode(opcode);
+		const char* opstr = Op::optostring(op);
+
+		size_t x = Op::x(opcode);
+		size_t y = Op::y(opcode);
+		uint8_t kk = Op::kk(opcode);
+		uint16_t nnn = Op::nnn(opcode);
+
 		switch(op){
-			case Opcode::JP:
-				nnn = Opcode::nnn(opcode);
+			case Op::SYS: // Ignored
+				printf("Ignoring SYS op\n");
+				break;
+			case Op::JP: 
 				printf("addr: %04x\n", nnn);
-				this->pc = nnn;
+				switch(opcode & 0xF000){
+					case 0x1000: // 1nnn - jump to address nnn
+						this->pc = nnn;
+						break;
+					case 0xB000: // Bnnn - jump to address nnn + v[0]
+						this->pc = nnn + this->v[0];
+						break;
+				}
 				break;
-			case Opcode::LD: 	// Set VX to KK
-				this->v[x] = kk;
+			case Op::LD: 	
+				switch(opcode & 0xF000){
+					case 0x6000: // 6xkk - Set Vx to kk
+						this->v[x] = kk;
+						break;
+					case 0x8000: // 8xy0 - Set Vx to Vy
+						this->v[x] = this->v[y];
+						break;
+					case 0xA000: // annn - Set i to address nnn
+						this->i = nnn;
+						break;
+					case 0xF000:
+						switch(opcode & 0x00FF){
+							case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
+								this->dt = this->v[x];
+								break;
+							case 0x000A: // Fx0A - LD Vx, K
+								// this->v[x] = get_key();
+								break;
+							case 0x0015: // Fx15 - LD DT, Vx
+								this->v[x] = this->dt;
+								break;
+							case 0x0018: // Fx18 - LD ST, Vx
+								this->v[x] = this->st;
+								break;
+							case 0x001E: // Fx1E - ADD I, Vx
+								this->v[x] += this->i;
+								break;
+							case 0x0029: // Fx29 - LD F, Vx
+								// The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
+								this->i = this->v[x];
+								break;
+							case 0x0033: // Fx33 - LD B, Vx
+								// TODO
+								// Store BCD representation of Vx in memory locations I, I+1, and I+2.
+								// BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
+								break;
+							case 0x0055: // Fx55 - LD [I], Vx
+								// Store registers V0 through Vx in memory starting at location I (without modifications to I).
+								break;
+							case 0x0065: // Fx65 - LD Vx, [I]
+								// Read from registers V0 through Vx in memory starting at location I.
+								break;	
+						}
+				}
 				break;
-			case Opcode::ADD: 	// Add KK to VX
+			case Op::ADD: 	// Add kk to Vx
 				this->v[x] += kk;
 				break;
-			case Opcode::LDR: 	// Sets VX to value of VY
-				this->v[x] = v[y];
-				break;
-			case Opcode::SYS:
-				printf("addr: %04x\n", nnn);
-				break;
+			default:
+				printf("Error: Invalid opcode {%04x}\n", opcode);
 		}
+		printf("0x%04x: 0x%04x %s\n", this->pc, opcode, opstr);
 	}
 
 	uint8_t decode(uint16_t opcode){
@@ -176,87 +228,87 @@ public:
 			case 0x0000:
 				switch(opcode & 0x00FF){
 					case 0x00E0:
-						op = Opcode::CLS; // 00E0 no args
+						op = Op::CLS; // 00E0 no args
 						break;
 					case 0x00EE:
-						op = Opcode::RET; // 0xee no args
+						op = Op::RET; // 0xee no args
 						break;
 					default:
-						op = Opcode::SYS; // 0nnn addr
+						op = Op::SYS; // 0nnn addr
 						break;
 				}
 				break;
 			case 0x1000: 
-				op = Opcode::JP; // 1nnn addr
+				op = Op::JP; // 1nnn addr
 				break;
 			case 0x2000:
-				op = Opcode::CALL; // 2nnn addr
+				op = Op::CALL; // 2nnn addr
 				break;
 			case 0x3000:
-				op = Opcode::SE; // 3xkk Vx, byte
+				op = Op::SE; // 3xkk Vx, byte
 				break;
 			case 0x4000:
-				op = Opcode::SNE; // 4xkk Vx, byte
+				op = Op::SNE; // 4xkk Vx, byte
 				break;
 			case 0x6000: 
-				op = Opcode::LD; // 6xkk Vx, byte
+				op = Op::LD; // 6xkk Vx, byte
 				break;
 			case 0x7000: 
-				op = Opcode::ADD; // 7xkk Vx, byte
+				op = Op::ADD; // 7xkk Vx, byte
 				break;
 			case 0x8000:
 				switch(opcode & 0x000F){
 					case 0x0000: // 8xy0 - LD Vx, Vy
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
 					case 0x0001: // 8xy1 - OR Vx, Vy
-						op = Opcode::OR;
+						op = Op::OR;
 						break;
 					case 0x0002: // 8xy2 - AND Vx, Vy
-						op = Opcode::AND;
+						op = Op::AND;
 						break;
 					case 0x0003: // 8xy3 - XOR Vx, Vy
-						op = Opcode::XOR;
+						op = Op::XOR;
 						break;
 					case 0x0004: // 8xy4 - ADD Vx, Vy
-						op = Opcode::ADD;
+						op = Op::ADD;
 						break;
 					case 0x0005: // 8xy5 - SUB Vx, Vy
-						op = Opcode::SUB;
+						op = Op::SUB;
 						break;
 					case 0x0006: // 8xy6 - SHR Vx {, Vy}
-						op = Opcode::SHR;
+						op = Op::SHR;
 						break;
 					case 0x0007: // 8xy7 - SUBN Vx, Vy
-						op = Opcode::SUBN;
+						op = Op::SUBN;
 						break;
 					case 0x000E: // 8xyE - SHL Vx {, Vy}
-						op = Opcode::SHL;
+						op = Op::SHL;
 						break;
 				}
 				break;
 			case 0x9000:
-				op = Opcode::SNE; // 9xy0 - SNE Vx, Vy
+				op = Op::SNE; // 9xy0 - SNE Vx, Vy
 				break;
 			case 0xA000:
-				op = Opcode::LD; // Annn - LD I, addr
+				op = Op::LD; // Annn - LD I, addr
 				break;
 			case 0xB000:
-				op = Opcode::JP; // Bnnn - JP V0, addr
+				op = Op::JP; // Bnnn - JP V0, addr
 				break;
 			case 0xC000:
-				op = Opcode::RND; // Cxkk - RND Vx, byte
+				op = Op::RND; // Cxkk - RND Vx, byte
 				break;
 			case 0xD000:
-				op = Opcode::DRW; // Vx, Vy, nibble
+				op = Op::DRW; // Vx, Vy, nibble
 				break;
 			case 0xE000: 
 				switch(opcode & 0x00FF){
 					case 0x009E:
-						op = Opcode::SKP; // Ex9E - SKP Vx
+						op = Op::SKP; // Ex9E - SKP Vx
 						break;
 					case 0x00A1:
-						op = Opcode::SKNP;// ExA1 - SKNP Vx
+						op = Op::SKNP;// ExA1 - SKNP Vx
 						break;
 					default:
 						printf("Error: Invalid opcode: {%04x}\n", opcode);
@@ -267,39 +319,39 @@ public:
 				switch(opcode & 0x00FF){
 					// Fx07 - LD Vx, DT
 					case 0x0007:
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
             		// Fx0A - LD Vx, K
 					case 0x000A:
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
             		// Fx15 - LD DT, Vx
 					case 0x0015:
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
             		// Fx18 - LD ST, Vx
 					case 0x0018: 
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
 					// Fx1E - ADD I, Vx
 					case 0x001E: 
-						op = Opcode::ADD;
+						op = Op::ADD;
 						break;
 					// Fx29 - LD F, Vx
 					case 0x0029:
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
 					// Fx33 - LD B, Vx
 					case 0x0033:
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
 					// Fx55 - LD [I], Vx
 					case 0x0055:
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
 					// Fx65 - LD Vx, [I]
 					case 0x0065:
-						op = Opcode::LD;
+						op = Op::LD;
 						break;
 					default:
 						printf("Error: Invalid opcode: {%04x}\n", opcode);
