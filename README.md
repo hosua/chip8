@@ -1,3 +1,5 @@
+This is still a work in progress
+
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
 
@@ -9,4 +11,3 @@
 
 [test-rom](https://github.com/corax89/chip8-test-rom)
 
-This is still a work in progress
