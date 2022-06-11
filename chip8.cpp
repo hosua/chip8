@@ -16,16 +16,27 @@
 
 // MEM_SIZE is how much RAM the chip8 can access
 #define MEM_SIZE 4096
+#define STACK_SIZE 64
+#define NUM_VREGS 16
+#define NUM_KEYS 16
 
 using std::cout;
 using std::endl;
 using std::string;
 
+class Chip8;
+class CPU;
+
+void print_registers(CPU);
+void print_stack(CPU);
+void print_args(uint16_t opcode, size_t x, size_t y, uint8_t kk, uint16_t nnn, uint8_t n);
+
+
 // See section 2.4 - Display
 // "These sprites are 5 bytes long"
 unsigned char textfont[80] = {
 	// 1, 2 	3, 	  4, 	5 bytes
-	0xf0, 0x90, 0x90, 0x90, 0xF0, // 0
+	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
 	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
 	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
@@ -43,7 +54,6 @@ unsigned char textfont[80] = {
 	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 };
 
-// Note that KK is synonymous with NN
 namespace Op {
 	enum { CLS, RET, SYS, JP, CALL, 
 			SE, SNE, LD, ADD, LDR, 
@@ -77,25 +87,30 @@ namespace Op {
 			case SKNP: return "SKNP";
 			default: return "WTF???";
 		}
-		return "You fucked up kid\n";
+		return "";
 	}
 	// Chip8 uses Big-endian
 	// Big-endian reads from msb -> lsb
 	// Examples: 3xkk, 5xy0
 	// x = 4-bit index of the V register (V0-VF)
-	// y = 4-bit index of the V register (V0-VF)
-	// kk = 8-bit constant
 	size_t x(uint16_t opcode){
 		return (opcode & 0x0F00) >> 8; 
 	}
+	// y = 4-bit index of the V register (V0-VF)
 	size_t y(uint16_t opcode){
 		return (opcode & 0x00F0) >> 4;
 	}
+	// kk = 8-bit constant
 	uint8_t kk(uint16_t opcode){
 		return (opcode & 0x00FF);
 	}
+	// nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
 	uint16_t nnn(size_t opcode){
 		return (opcode & 0x0FFF);
+	}
+	// n or nibble - A 4-bit value, the lowest 4 bits of the instruction
+	uint8_t n(uint16_t opcode){
+		return (opcode	& 0x000F);
 	}
 
 }
@@ -105,31 +120,20 @@ public:
 	Chip8(){
 		srand(time(0)); // Init RNG
 	}
-	uint8_t mem[MEM_SIZE] = {0};
+	uint8_t mem[MEM_SIZE] = {0}; // RAM of the chip8
+	uint8_t gfx[64 * 32] = {0}; // 64x32 display
+	uint8_t keys[NUM_KEYS] = {0};
 
-	std::ifstream::pos_type GetFilesize(const char* filename){
-		std::ifstream file_stream(filename, std::ifstream::ate | std::ifstream::binary);
-		return file_stream.tellg();
-	}
-
-	// https://stackoverflow.com/questions/15138785/how-to-read-a-file-into-vector-in-c
-	std::vector<uint8_t> GetROMData(const char* rom_file){
-		size_t rom_size = GetFilesize(rom_file);
+	void LoadROM(const char* rom_file){
+		// Get length of file 
+		size_t rom_size = std::filesystem::file_size(rom_file);
+		cout << "ROM size: " << rom_size << endl;
 		std::ifstream file_stream(rom_file, std::ios::in | std::ios::binary);
 		std::istream_iterator<uint8_t> start(file_stream), end;
 		std::vector<uint8_t> rom_data(start, end);
-		return rom_data;
-	}
 
-	void LoadRom(const char* rom_file){
-		std::vector<uint8_t> rom_data;
-		// Get length of file 
-		int rom_size = std::filesystem::file_size(rom_file);
-		cout << "ROM size: " << rom_size << endl;
-
-		rom_data = GetROMData(rom_file);
 		
-		// Load ROM into main memory at 0x200
+		// Load ROM into RAM at 0x200
 		// Most Chip-8 programs start at location 0x200 (512), but some begin at 0x600 (1536). 
 		// Programs beginning at 0x600 are intended for the ETI 660 computer.
 		for (int i = 0; i < rom_size; i++){
@@ -145,36 +149,41 @@ public:
 // 1) CPU registers 
 // 2) CPU instructions
 // More info here in section 2.2: http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
-class CPU {
+class CPU { 
 public:
-	uint16_t stack[16] = {0}; // Stack
-	uint16_t sp = 0x0; // Stack pointer
-	uint8_t v[16] = {0}; // Vx registers
-	uint16_t i = 0x0; // Stores memory addresses
+	uint8_t stack[STACK_SIZE] = {0}; // The 64-byte stack
+	uint8_t sp = 0x0; // 8-bit Stack pointer
+	uint8_t v[NUM_VREGS] = {0}; // Vx registers
+	uint16_t i = 0x0; // 16-bit index register. Stores memory addresses
 	uint16_t pc = 0x200; // Program counter (set it to the beginning of ROM)
 	uint8_t dt = 0x0; // Delay timer
-	uint8_t st = 0x0; // Sound timer
+	uint8_t st = 0x0; // 8-bit Sound timer
+	uint16_t opcode = 0;
+	uint8_t* RAM;
+
+	CPU(Chip8 chip8){
+		RAM = chip8.mem;
+	}
 					  
 	// Chip-8 instructions are 2 bytes (16-bits) long 
 	void cycle(Chip8 chip8){
-		uint8_t *memory = chip8.mem;
-		// Get the next opcode (read 16 bits)
-		uint16_t opcode = memory[this->pc] << 8 | memory[this->pc + 1];
-
-		operate(opcode);
+		// Fetch the next opcode (read 16 bits)
+		uint8_t op;
+		opcode = RAM[this->pc] << 8 | RAM[this->pc + 1];
+		op = decode(opcode);
+		execute(op);
+		this->pc += 2; // increment program counter
 	}
 
-	// Perform CPU instructions
-	void operate(uint16_t opcode){
-		uint16_t op = decode(opcode);
+	// Execute CPU instructions
+	void execute(uint8_t op){
 		const char* opstr = Op::optostring(op);
 		// pc, opcode, opstr
-
-		size_t x = Op::x(opcode);
-		size_t y = Op::y(opcode);
-		uint8_t kk = Op::kk(opcode);
-		uint16_t nnn = Op::nnn(opcode);
-
+		size_t x = Op::x(opcode); // x - A 4-bit value, the lower 4 bits of the high byte of the instruction
+		size_t y = Op::y(opcode); // y - A 4-bit value, the upper 4 bits of the low byte of the instruction
+		uint8_t kk = Op::kk(opcode); // kk or byte - An 8-bit value, the lowest 8 bits of the instruction
+		uint16_t nnn = Op::nnn(opcode); // nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
+		uint8_t n = Op::n(opcode); // n or nibble - A 4-bit value, the lowest 4 bits of the instruction
 		printf("0x%04x: 0x%04x ", this->pc, opcode);
 
 		switch(op){
@@ -182,23 +191,21 @@ public:
 			printf("\nError: Invalid opcode {%04x}\n", opcode);
 			break;
 		case Op::SYS: // Ignored
-			printf("Ignoring SYS op\n");
-			this->pc += 2;
+			printf("\n");
+			// printf("Ignoring SYS op\n");
 			break;
 		case Op::JP: 
-			// Since we always increment pc every cycle, we need to decrement because
-			// we should increment after jumps
 			switch(opcode & 0xF000){
 			default:
 				printf("\nError: Invalid opcode {%04x}\n", opcode);
 				break;
 			case 0x1000: // 1nnn - jump to address nnn
-				this->pc = nnn;
+				this->i = nnn;
 				printf("JP 0x%x\n", nnn);
 				break;
 			case 0xB000: // Bnnn - jump to address nnn + v[0]
-				this->pc = nnn + this->v[0];
-				printf("JP 0x%03x + 0x%x\n", v[0]);
+				this->i = nnn + this->v[0];
+				printf("JP 0x%03x + 0x%x\n", v[0], nnn);
 				break;
 			}
 			break;
@@ -210,17 +217,14 @@ public:
 			case 0x6000: // 6xkk - Set Vx to kk
 				this->v[x] = kk;
 				printf("%s V%i 0x%02x\n", opstr, x, kk);
-				this->pc += 2;
 				break;
 			case 0x8000: // 8xy0 - Set Vx to Vy
 				this->v[x] = this->v[y];
 				printf("%s V%i V%i\n", opstr, this->v[x], this->v[y]);
-				this->pc += 2;
 				break;
 			case 0xA000: // annn - Set i to address nnn
-				printf("%s 0x%03x I\n", opstr, nnn);
+				printf("%s 0x%03x -> I\n", opstr, nnn);
 				this->i = nnn;
-				this->pc += 2;
 				break;
 			case 0xF000:
 				switch(opcode & 0x00FF){
@@ -230,45 +234,37 @@ public:
 				case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
 					this->dt = this->v[x];
 					printf("%s V%i DT\n", opstr, x);
-					this->pc += 2;
 					break;
 				case 0x000A: // Fx0A - LD Vx, K
 					// this->v[x] = get_key();
 					printf("%s Vx, k NOT IMPLEMENTED\n", opstr);
-					this->pc += 2;
 					break;
 				case 0x0015: // Fx15 - LD DT, Vx
 					this->v[x] = this->dt;
 					printf("%s DT V%i\n", opstr, x);
-					this->pc += 2;
 					break;
 				case 0x0018: // Fx18 - LD ST, Vx
 					this->v[x] = this->st;
 					printf("%s ST V%i\n", opstr, x);
-					this->pc += 2;
 					break;
 				case 0x0029: // Fx29 - LD F, Vx
 					// The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
 					this->i = this->v[x];
 					printf("%s F V%i\n", opstr, x);
-					this->pc += 2;
 					break;
 				case 0x0033: // Fx33 - LD B, Vx
 					// TODO
-					// Store BCD representation of Vx in memory locations I, I+1, and I+2.
+					// Store BCD representation of Vx in RAM locations I, I+1, and I+2.
 					// BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
 					printf("%s NOT IMPLEMENTED\n", opstr);
-					this->pc += 2;
 					break;
 				case 0x0055: // Fx55 - LD [I], Vx
-					// Store registers V0 through Vx in memory starting at location I (without modifications to I).
+					// Store registers V0 through Vx in RAM starting at location I (without modifications to I).
 					printf("%s NOT IMPLEMENTED\n", opstr);
-					this->pc += 2;
 					break;
 				case 0x0065: // Fx65 - LD Vx, [I]
-					// Read from registers V0 through Vx in memory starting at location I.
+					// Read from registers V0 through Vx in RAM starting at location I.
 					printf("%s NOT IMPLEMENTED\n", opstr);
-					this->pc += 2;
 					break;	
 				}
 			}
@@ -277,37 +273,29 @@ public:
 				case 0x7000: // ADD Vx, byte
 					this->v[x] += kk;
 					printf("ADD V%i 0x%02x\n", kk);
-					this->pc += 2;
 					break;
 				case 0x8000: // 8xy4 ADD Vx, Vy
 					this->v[y] += this->v[x]; 
 					printf("ADD V%i V%i\n", this->v[x], this->v[y]);
-					this->pc += 2;
 					break;
-				case 0xF000: // ADD I, Vx
-					this->v[x] += this->i;
+				case 0x001E: // Fx1E ADD I = I + Vx
+					this->i += this->v[x];
 					printf("ADD I, V%i\n", x);
-					this->pc += 2;
-					break;
-				case 0x001E: // Fx1E - ADD I, Vx
-					this->v[x] += this->i;
-					printf("ADD I V%i\n", x);
-					this->pc += 2;
 					break;
 			}
 			break;
 		case Op::SE:
-			printf("WARNING: %s NOT IMPLEMENTED CORRECTLY\n", opstr);
-			this->pc += 2;
+			printf("WARNING: %s NOT IMPLEMENTED\n", opstr);
 			break;
 		case Op::CALL:
-			/*
-			this->stack[this->sp] = this->pc;
 			this->sp++; // Increment stack pointer
 			this->pc = nnn; // Store address into program counter
-			*/
-			printf("WARNING: %s NOT IMPLEMENTED CORRECTLY\n", opstr);
-			this->pc += 2; // TODO: This is wrong but I'm skipping this opcode for now
+			this->stack[this->sp] = this->pc; // Put pc on top of the stack
+			printf("%s\n", opstr);
+			print_registers(*this);
+			// print_stack(*this);
+			print_args(opcode, x, y, kk, nnn, n);
+			// printf("WARNING: %s NOT IMPLEMENTED\n", opstr);
 			break;
 		
 		case Op::RND: // RND Vx 
@@ -316,7 +304,7 @@ public:
 			this->pc += 2;
 			break;
 		case Op::DRW:
-			printf("WARNING: CALL NOT IMPLEMENTED CORRECTLY\n");
+			printf("WARNING: %s NOT IMPLEMENTED\n", opstr);
 			this->pc += 2;
 			break;
 		}
@@ -324,7 +312,7 @@ public:
 
 	uint8_t decode(uint16_t opcode){
 		uint8_t op;
-		// opcode & 0x000F extracts the value at F
+
 		switch(opcode & 0xF000){
 			case 0x0000:
 				switch(opcode & 0x00FF){
@@ -468,8 +456,42 @@ public:
 	}
 };
 
-void print_registers(Chip8 chip8){
-	
+void print_registers(CPU cpu){
+	// uint16_t stack[64] = {0}; // Stack
+	// uint16_t sp = 0x0; // Stack pointer
+	// uint8_t v[16] = {0}; // Vx registers
+	// uint16_t i = 0x0; // Stores memory addresses
+	// uint16_t pc = 0x200; // Program counter (set it to the beginning of ROM)
+	// uint8_t dt = 0x0; // Delay timer
+	// uint8_t st = 0x0; // Sound timer
+	// Print all v regs
+	printf("------------\n");
+	printf("v registers:\n");
+	for (int i = 0; i < NUM_VREGS; i++)
+		printf("v[%i]: 0x%02x\n", i, cpu.v[i]);
+	printf("sp: 0x%04x\n", cpu.sp);
+	printf("i: 0x%04x\n", cpu.i);
+	printf("pc: 0x%04x\n", cpu.pc);
+	printf("dt: 0x%02x\n", cpu.dt);
+	printf("st: 0x%02x\n", cpu.st);
+	printf("------------\n");
+}
+
+void print_stack(CPU cpu){
+	printf("------------\n");
+	printf("stack:\n");
+	for (int i = 0; i < STACK_SIZE; i++)
+		printf("s[%i]: 0x%02x\n", i, cpu.stack[i]);
+	printf("------------\n");
+}
+
+void print_args(uint16_t opcode, size_t x, size_t y, uint8_t kk, uint16_t nnn, uint8_t n){
+	printf("opcode: 0x%04x\n", opcode);
+	printf("x: 0x%01x\n", x);
+	printf("y: 0x%01x\n", y);
+	printf("kk: 0x%02x\n", kk);
+	printf("nnn: 0x%03x\n", nnn);
+	printf("n: 0x%01x\n", n);
 }
 
 
@@ -481,12 +503,13 @@ int main(int argc, char *argv[]){
 	}
 	printf("===============START================\n");
 	Chip8 chip8;
-	// chip8.LoadRom("chip8-test-rom", "test_opcode.ch8");
-	chip8.LoadRom(rom_path);
-	CPU cpu;
-	// for (int i = 0; i < 0xFF/2; i++){
-	for (;;){
+	// chip8.LoadROM("chip8-test-rom", "test_opcode.ch8");
+	chip8.LoadROM(rom_path);
+	CPU cpu(chip8);
+	size_t cycles = 10;
+	for (int i = 0; i < cycles; i++){
 		cpu.cycle(chip8);
+		// print_registers(cpu);
 	}
 	return 1;
 }
