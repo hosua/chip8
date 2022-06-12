@@ -555,25 +555,24 @@ class CPU {
 
 class Display {
 public:
-	Chip8 chip8;
-	Display(Chip8 chip8){
+	Chip8* chip8;
+	Display(Chip8* chip8){
 		this->chip8 = chip8;
 	}
 	uint8_t screen[DISP_X * DISP_Y];
-	void clr_screen(){
+	void ClrScreen(){
 		for (int i = 0; i < DISP_X * DISP_X; i++)
 			screen[i] = 0;
 		printf("CLEARED SCREEN\n");
 	}
 
-	void drawScreen(){
-		// If draw occurred, redraw SDL screen
-        if (chip8.should_draw) {
-            chip8.should_draw = false;
+	void DrawScreen(){
+        if (chip8->should_draw) {
+            chip8->should_draw = false;
 
             // Store pixels in temporary buffer
             for (int i = 0; i < 2048; ++i) {
-                uint8_t px = chip8.gfx[i];
+                uint8_t px = chip8->gfx[i];
                 screen[i] = (0x00FF * px) | 0xFF00;
             }
 
@@ -604,13 +603,13 @@ int main(int argc, char *argv[]){
 	Chip8 chip8;
 	chip8.LoadROM(rom_path); // ROM must load before CPU is initialized
 	CPU cpu(&chip8);
-	Display disp(chip8);
+	Display disp(&chip8);
 	size_t cycles = 50;
 	for (int i = 0; i < cycles; i++){
 		cpu.cycle();
 		getchar();
 		printf("Should draw: %i\n", chip8.should_draw);
-		disp.drawScreen();
+		disp.DrawScreen();
 	}
 	return 1;
 }
