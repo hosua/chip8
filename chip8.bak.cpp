@@ -119,10 +119,6 @@ class Chip8 {
 		Chip8(){
 			srand(time(0)); // Init RNG
 		}
-		Chip8(const char* rom_path){
-			srand(time(0)); // Init RNG
-			LoadROM(rom_path);
-		}
 		uint8_t mem[MEM_SIZE] = {0}; // mem of the chip8
 		uint8_t gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
 		uint8_t keys[NUM_KEYS] = {0};
@@ -179,7 +175,7 @@ class Chip8 {
 
 class CPU {
 	public:
-		Chip8* chip8;
+		Chip8 chip8;
 		uint8_t stack[STACK_SIZE] = {0}; // The 64-byte stack
 		uint8_t sp = 0x0; // 8-bit Stack pointer
 		uint8_t v[NUM_VREGS] = {0}; // Vx registers
@@ -190,9 +186,8 @@ class CPU {
 		uint8_t *mem;
 		uint16_t opcode = 0;
 
-		CPU(Chip8* chip8){
-			this->chip8 = chip8;
-			this->mem = chip8->mem;
+		CPU(Chip8 chip8){
+			this->mem = chip8.mem;
 		}
 
 		// Chip-8 instructions are 2 bytes (16-bits) long 
@@ -484,25 +479,25 @@ class CPU {
 							// if pixel is set
 							if ((px & (0x80 >> vx))){ 
 								// and if gfx is set
-								if(chip8->gfx[(x + vx + ((y + vy) * DISP_X))]){ 
+								if(chip8.gfx[(x + vx + ((y + vy) * DISP_X))]){ 
 									// Set VF flag to 1 indicating that we have a collision
 									v[0xF] = 1;	
 								}
 								// XOR Sprite onto the screen
-								chip8->gfx[x + vx + ((y + vy) * DISP_X)] ^= 1;
+								chip8.gfx[x + vx + ((y + vy) * DISP_X)] ^= 1;
 							}
 						}
 					}
 					// print_gfx();
-					chip8->should_draw = true;
+					chip8.should_draw = true;
 					break;
 				}
 				case Op::CLS: // Clear screen
 					printf("%s\n", opstr);
 					// Clear 64x32 display
 					for(int i = 0; i < DISP_X*DISP_Y; i++)
-						chip8->gfx[i] = 0;
-					chip8->should_draw = true;
+						chip8.gfx[i] = 0;
+					chip8.should_draw = true;
 					break;
 			}
 		}
@@ -539,7 +534,7 @@ class CPU {
 
 		void print_gfx(){
 			for (int i = 0; i < DISP_X*DISP_Y; i++){
-				if (chip8->gfx[i]) {
+				if (chip8.gfx[i]) {
 					printf("%s", PX);
 					// printf("1");
 				} else {
@@ -603,12 +598,13 @@ int main(int argc, char *argv[]){
 	printf("===============START================\n");
 	Chip8 chip8;
 	chip8.LoadROM(rom_path); // ROM must load before CPU is initialized
-	CPU cpu(&chip8);
+	CPU cpu(chip8);
 	Display disp(chip8);
+	const char* rand_var = (const char*)malloc(100);
 	size_t cycles = 50;
 	for (int i = 0; i < cycles; i++){
 		cpu.cycle();
-		getchar();
+		scanf("%s", &rand_var);
 		printf("Should draw: %i\n", chip8.should_draw);
 		disp.drawScreen();
 	}
