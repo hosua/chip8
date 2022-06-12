@@ -351,7 +351,7 @@ class CPU {
 			uint8_t n = Op::n(opcode); // n or nibble - A 4-bit value, the lowest 4 bits of the instruction
 			uint8_t px; // For draw
 			printf("0x%04x: 0x%04x ", this->pc, opcode);
-
+			printf("%s ", opstr);
 			switch(op){
 				default:
 					printf("\nError: Invalid opcode {%04x}\n", opcode);
@@ -367,12 +367,12 @@ class CPU {
 							break;
 						case 0x1000: // 1nnn - jump to address nnn
 							this->pc = nnn;
-							printf("JP 0x%03x\n", nnn);
+							printf("0x%03x\n", nnn);
 							this->pc -= 2;
 							break;
 						case 0xB000: // Bnnn - jump to address nnn + v[0]
 							this->pc = nnn + v[0];
-							printf("JP 0x%03x + 0x%03x\n", v[0], nnn);
+							printf("0x%03x + 0x%03x\n", v[0], nnn);
 							this->pc -= 2;
 							break;
 					}
@@ -384,17 +384,17 @@ class CPU {
 							break;
 						case 0x6000: // 6xkk - Set Vx to kk
 							this->v[x] = kk;
-							printf("%s V%i 0x%02x\n", opstr, x, kk);
+							printf("V%i 0x%02x\n", x, kk);
 							// print_args(opcode, x, y, kk, nnn, n);
 							// print_registers();
 							break;
 						case 0x8000: // 8xy0 - Set Vx to Vy
 							this->v[x] = this->v[y];
-							printf("%s V%i V%i\n", opstr, this->v[x], this->v[y]);
+							printf("V%i V%i\n", this->v[x], this->v[y]);
 							break;
 						case 0xA000: // annn - Set i to address nnn
 							this->i = nnn;
-							printf("%s 0x%03x -> I\n", opstr, nnn);
+							printf("0x%03x -> I\n", nnn);
 							// print_registers();
 							break;
 						case 0xF000:
@@ -404,7 +404,7 @@ class CPU {
 									break;
 								case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
 									this->dt = this->v[x];
-									printf("%s V%i DT\n", opstr, x);
+									printf("V%i DT\n", x);
 									break;
 								case 0x000A: // Fx0A - LD Vx, K
 											 // this->v[x] = get_key();
@@ -412,16 +412,16 @@ class CPU {
 									break;
 								case 0x0015: // Fx15 - LD DT, Vx
 									this->v[x] = this->dt;
-									printf("%s DT V%i\n", opstr, x);
+									printf("V%i\n", x);
 									break;
 								case 0x0018: // Fx18 - LD ST, Vx
 									this->v[x] = this->st;
-									printf("%s ST V%i\n", opstr, x);
+									printf("V%i\n", x);
 									break;
 								case 0x0029: // Fx29 - LD F, Vx
 											 // The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
-									this->i = this->v[x];
-									printf("%s F V%i\n", opstr, x);
+									// this->i = this->v[x]; // ??? TODO: This is definitely not right
+									printf("WARNING: %s NOT IMPLEMENTED\n", opstr);
 									break;
 								case 0x0033: // Fx33 - LD B, Vx
 											 // TODO
@@ -463,7 +463,6 @@ class CPU {
 					this->sp++; // Increment stack pointer
 					this->pc = nnn; // Store address into program counter
 					this->stack[this->sp] = this->pc; // Put pc on top of the stack
-					printf("%s\n", opstr);
 					// print_registers();
 					// print_args(opcode, x, y, kk, nnn, n);
 					// printf("WARNING: %s NOT IMPLEMENTED\n", opstr);
@@ -475,7 +474,7 @@ class CPU {
 					break;
 				case Op::DRW:
 				{
-					printf("%s: x: 0x%01x y: 0x%01x n: %i i: 0x%02x\n", opstr, x, y, n, this->i);
+					printf("Vx: 0x%01x Vy: 0x%01x n: %i i: 0x%02x\n", this->v[x], this->v[y], n, this->i);
 					/* Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. 
 					 * Each row of 8 pixels is read as bit-coded starting from memory location I; I value does not 
 					 * change after the execution of this instruction. As described above, VF is set to 1 if any 
@@ -494,7 +493,7 @@ class CPU {
 						px = this->mem[this->i + dy];
 						for(int dx = 0; dx < 8; dx++){
 							// dx is the x position of the pixel in the line being drawn
-							if((px & (0x80 >> dx)) != 0){
+							if(px & (0x80 >> dx)){
 								// and if gfx is set
 								if(chip8->gfx[(this->v[x] + dx + ((this->v[y] + dy) * 64))]){
 									// Set VF flag to 1 indicating that at least one pixel was unset
@@ -570,25 +569,14 @@ public:
 	Display(Chip8* chip8){
 		this->chip8 = chip8;
 	}
-	uint8_t screen[DISP_X * DISP_Y];
-	void ClrScreen(){
-		for (int i = 0; i < DISP_X * DISP_X; i++)
-			screen[i] = 0;
-		printf("CLEARED SCREEN\n");
-	}
 
 	void DrawScreen(){
         if (chip8->draw_flag) {
             chip8->draw_flag = false;
 
-            // Store pixels in screen
-            for (int i = 0; i < 2048; ++i) {
-                uint8_t px = chip8->gfx[i];
-                screen[i] = (0x00FFFFFF * px) | 0xFF000000;
-            }
-
+			// Display graphics into terminal
 			for (int i = 0; i < DISP_X*DISP_Y; i++){
-				if (screen[i]) {
+				if (chip8->gfx[i]) {
 					printf("%s", PX);
 				} else {
 					printf("  ");
@@ -615,8 +603,9 @@ int main(int argc, char *argv[]){
 	chip8.LoadROM(rom_path); // ROM must load before CPU is initialized
 	CPU cpu(&chip8);
 	Display disp(&chip8);
-	size_t cycles = 50;
-	for (int i = 0; i < cycles; i++){
+	// size_t cycles = 50;
+	// for (int i = 0; i < cycles; i++){
+	for (;;){
 		cpu.cycle();
 		disp.DrawScreen();
 		getchar();
