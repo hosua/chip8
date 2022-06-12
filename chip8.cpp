@@ -157,6 +157,7 @@ class Chip8 {
 			return true;
 		}
 
+		// Load font set into memory
 		void LoadFont(uint8_t* font){
 			for (int i = 0; i < 0x80; i++){
 				this->mem[i] = font[i];
@@ -486,22 +487,20 @@ class CPU {
 					this->v[0xF] = 0;
 					// Here, we need to get the actual values from the V registers 
 					// This is different from the x,y functions defined in Op::, as those extract the bits from the opcode itself.
-			        x = this->v[(opcode & 0x0F00) >> 8];
-					y = this->v[(opcode & 0x00F0) >> 4];
 					n = opcode & 0x000F;
 					uint8_t px;
 					// vy is the y position of the line being drawn
-					for (int vy = 0; vy < n; vy++){
-						px = this->mem[this->i + vy];
-						for(int vx = 0; vx < 8; vx++){
-							// vx is the x position of the pixel in the line being drawn
-							if((px & (0x80 >> vx)) != 0){
+					for (int dy = 0; dy < n; dy++){
+						px = this->mem[this->i + dy];
+						for(int dx = 0; dx < 8; dx++){
+							// dx is the x position of the pixel in the line being drawn
+							if((px & (0x80 >> dx)) != 0){
 								// and if gfx is set
-								if(chip8->gfx[(x + vx + ((y + vy) * 64))]){
+								if(chip8->gfx[(this->v[x] + dx + ((this->v[y] + dy) * 64))]){
 									// Set VF flag to 1 indicating that at least one pixel was unset
 									this->v[0xF] = 1;
 								}
-								chip8->gfx[x + vx + ((y + vy) * 64)] ^= 1;
+								chip8->gfx[this->v[x] + dx + ((this->v[y] + dy) * 64)] ^= 1;
 							}
 						}
 					}
