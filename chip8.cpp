@@ -27,6 +27,7 @@ const char* PX = "\u2588\u2588"; // ██
 
 class Chip8;
 class CPU;
+class Display;
 
 void print_args(uint16_t opcode, size_t x, size_t y, uint8_t kk, uint16_t nnn, uint8_t n);
 
@@ -91,6 +92,7 @@ namespace Op {
 	// Chip8 uses Big-endian
 	// Big-endian reads from msb -> lsb
 	// Examples: 3xkk, 5xy0
+	// These extract the bits, not the values at the register
 	// x = 4-bit index of the V register (V0-VF)
 	size_t x(uint16_t opcode){
 		return (opcode & 0x0F00) >> 8; 
@@ -121,12 +123,13 @@ class Chip8 {
 		}
 		Chip8(const char* rom_path){
 			srand(time(0)); // Init RNG
+			LoadFont(textfont);
 			LoadROM(rom_path);
 		}
 		uint8_t mem[MEM_SIZE] = {0}; // mem of the chip8
 		uint8_t gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
 		uint8_t keys[NUM_KEYS] = {0};
-		bool should_draw = false; // draw flag
+		bool draw_flag = false; // draw flag
 
 		bool LoadROM(const char* rom_path){
 			// Get length of file 
@@ -152,6 +155,12 @@ class Chip8 {
 			free(rom_buf);
 			printf("Rom \"%s\" loaded into memory\n", rom_path);
 			return true;
+		}
+
+		void LoadFont(uint8_t* font){
+			for (int i = 0; i < 0x80; i++){
+				this->mem[i] = font[i];
+			}
 		}
 		
 		void print_display(){
@@ -475,26 +484,29 @@ class CPU {
 					// Each sprite will always be 8 pixels wide
 					// The nibble, n is the height we will draw */
 					this->v[0xF] = 0;
-					// d_y is the y position of the line being drawn
+					// Here, we need to get the actual values from the V registers 
+					// This is different from the x,y functions defined in Op::, as those extract the bits from the opcode itself.
+			        x = this->v[(opcode & 0x0F00) >> 8];
+					y = this->v[(opcode & 0x00F0) >> 4];
+					n = opcode & 0x000F;
+					uint8_t px;
+					// vy is the y position of the line being drawn
 					for (int vy = 0; vy < n; vy++){
-						// Get pixel from memory at the address i
-						px = this->mem[this->i + vy]; 
-						// vx is the x position of the pixel in the line being drawn
-						for (int vx = 0; vx < SPRITE_WIDTH; vx++){
-							// if pixel is set
-							if ((px & (0x80 >> vx))){ 
+						px = this->mem[this->i + vy];
+						for(int vx = 0; vx < 8; vx++){
+							// vx is the x position of the pixel in the line being drawn
+							if((px & (0x80 >> vx)) != 0){
 								// and if gfx is set
-								if(chip8->gfx[(x + vx + ((y + vy) * DISP_X))]){ 
-									// Set VF flag to 1 indicating that we have a collision
-									v[0xF] = 1;	
+								if(chip8->gfx[(x + vx + ((y + vy) * 64))]){
+									// Set VF flag to 1 indicating that at least one pixel was unset
+									this->v[0xF] = 1;
 								}
-								// XOR Sprite onto the screen
-								chip8->gfx[x + vx + ((y + vy) * DISP_X)] ^= 1;
+								chip8->gfx[x + vx + ((y + vy) * 64)] ^= 1;
 							}
 						}
 					}
-					// print_gfx();
-					chip8->should_draw = true;
+
+					chip8->draw_flag = true;
 					break;
 				}
 				case Op::CLS: // Clear screen
@@ -502,7 +514,7 @@ class CPU {
 					// Clear 64x32 display
 					for(int i = 0; i < DISP_X*DISP_Y; i++)
 						chip8->gfx[i] = 0;
-					chip8->should_draw = true;
+					chip8->draw_flag = true;
 					break;
 			}
 		}
@@ -567,13 +579,13 @@ public:
 	}
 
 	void DrawScreen(){
-        if (chip8->should_draw) {
-            chip8->should_draw = false;
+        if (chip8->draw_flag) {
+            chip8->draw_flag = false;
 
-            // Store pixels in temporary buffer
+            // Store pixels in screen
             for (int i = 0; i < 2048; ++i) {
                 uint8_t px = chip8->gfx[i];
-                screen[i] = (0x00FF * px) | 0xFF00;
+                screen[i] = (0x00FFFFFF * px) | 0xFF000000;
             }
 
 			for (int i = 0; i < DISP_X*DISP_Y; i++){
@@ -607,9 +619,8 @@ int main(int argc, char *argv[]){
 	size_t cycles = 50;
 	for (int i = 0; i < cycles; i++){
 		cpu.cycle();
-		getchar();
-		printf("Should draw: %i\n", chip8.should_draw);
 		disp.DrawScreen();
+		getchar();
 	}
 	return 1;
 }
