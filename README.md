@@ -1,3 +1,15 @@
+**This is still a work in progress**
+
+Currently, the IBM test ROM works! 
+
+Lots of opcodes among other things are still broken/not implemented yet though. 
+
+I also have not done graphics yet, I probably will use SDL to display them at some point, but I still need to learn how to do that. 
+
+Right now, I'm just verifying the graphics work by printing them into the terminal.
+
+![chip8](images/chip8.png)
+
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
 
@@ -13,4 +25,4 @@
 
 [test-rom](https://github.com/corax89/chip8-test-rom)
 
-This is still a work in progress
+
