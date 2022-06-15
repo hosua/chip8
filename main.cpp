@@ -13,6 +13,7 @@ int main(int argc, char *argv[]){
 	chip8.LoadROM(rom_path); // ROM must load before CPU is initialized
 	CPU cpu(&chip8);
 	Display disp(&chip8);
+	chip8.print_display();
 	// size_t cycles = 50;
 	// for (int i = 0; i < cycles; i++){
 	for (;;){

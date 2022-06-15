@@ -63,9 +63,9 @@ class Chip8 {
 			LoadFont(textfont);
 			LoadROM(rom_path);
 		}
-		uint8_t mem[MEM_SIZE]; // mem of the chip8
-		uint8_t gfx[DISP_X * DISP_Y]; // 64x32 display
-		uint8_t keys[NUM_KEYS];
+		uint8_t mem[MEM_SIZE] = {0}; // mem of the chip8
+		uint8_t gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
+		uint8_t keys[NUM_KEYS] = {0};
 		bool draw_flag = false; // draw flag
 
 		bool LoadROM(const char* rom_path);

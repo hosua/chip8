@@ -8,6 +8,4 @@ output="CHIP8"
 # rm *.o # clean obj files
 
 # lazy wildcard
-g++ *.cpp *.h -I. -o "$output"
-# ./"$output" "games/IBM"
-./"$output" "games/TEST_OP"
+g++ chip8.cpp -o "$output" && ./"$output" "../games/TEST_OP"
