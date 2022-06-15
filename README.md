@@ -8,7 +8,8 @@ I also have not done graphics yet, I probably will use SDL to display them at so
 
 Right now, I'm just verifying the graphics work by printing them into the terminal.
 
-![chip8](images/chip8.png)
+![chip8-1](images/ibm_test.png)
+![chip8-2](images/opcode_test.png)
 
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
