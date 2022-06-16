@@ -159,7 +159,7 @@ void CPU::execute(uint8_t op){
 			switch(opcode & 0xF000){
 				case 0x7000: // ADD Vx, byte
 					this->v[x] += kk;
-					printf("ADD 0x%02x -> V%i\n", kk, x);
+					printf("ADD 0x%02x -> V%zu\n", kk, x);
 					// print_registers();
 					break;
 				case 0x8000: // 8xy4 ADD Vx, Vy
@@ -168,7 +168,7 @@ void CPU::execute(uint8_t op){
 					break;
 				case 0x001E: // Fx1E ADD I = I + Vx
 					this->i += this->v[x];
-					printf("I, V%i\n", x);
+					printf("I, V%zu\n", x);
 					break;
 			}
 			break;
@@ -244,7 +244,7 @@ void CPU::execute(uint8_t op){
 					break;
 				case 0x6000: // 6xkk - Set Vx to kk
 					this->v[x] = kk;
-					printf("V%i 0x%02x\n", x, kk);
+					printf("V%zu 0x%02x\n", x, kk);
 					this->pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
 					break;
 				case 0x8000: // 8xy0 - Set Vx to Vy
@@ -262,7 +262,7 @@ void CPU::execute(uint8_t op){
 							break;
 						case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
 							this->dt = this->v[x];
-							printf("V%i DT\n", x);
+							printf("V%zu DT\n", x);
 							break;
 						case 0x000A: // Fx0A - LD Vx, K
 									 // this->v[x] = get_key();
@@ -270,22 +270,22 @@ void CPU::execute(uint8_t op){
 							break;
 						case 0x0015: // Fx15 - LD DT, Vx
 							this->v[x] = this->dt;
-							printf("V%i\n", x);
+							printf("V%zu\n", x);
 							break;
 						case 0x0018: // Fx18 - LD ST, Vx
 							this->v[x] = this->st;
-							printf("V%i\n", x);
+							printf("V%zu\n", x);
 							break;
 						case 0x0029: // Fx29 - LD F Vx -> I
 									 // The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
-							printf("F V%i -> I\n", x);
+							printf("F V%zu -> I\n", x);
 							this->i = this->v[x] * 0x5; // Each font is 5 bytes wide (as shown in textfont) 
 							break;
 						case 0x0033: // Fx33 - LD B, Vx
 									 // TODO
 									 // Store BCD representation of Vx in mem locations I, I+1, and I+2.
 									 // BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
-							printf("LD B, V%i\n", x);
+							printf("LD B, V%zu\n", x);
 							this->mem[this->i] = this->v[x] / 100; // Load 100s place into memory
 							this->mem[this->i+1] = (this->v[x] / 10) % 10; // Load 10s place into memory
 							this->mem[this->i+2] = this->v[x] % 10; // Load 1s place into memory
@@ -294,14 +294,14 @@ void CPU::execute(uint8_t op){
 							for (int i = 0; i <= x; i++){
 								// Stores from V0 to VX (including VX) into memory, starting at address I. The offset from I is increased by 1 for each value written, 
 								// but I itself is left unmodified.
-								printf("I -> V%i\n", x);
+								printf("I -> V%zu\n", x);
 								this->mem[this->i + i] = this->v[i];
 							}
 							this->i += x + 1;
 							break;
 						case 0x0065: // Fx65 - LD Vx, [I]
 									 // Read from memory starting at address I into v registers
-							printf("LD V0-V%i -> I\n", x);
+							printf("LD V0-V%zu -> I\n", x);
 							for (int i = 0; i <= x; i++){
 								this->v[i] = this->mem[this->i + i];
 							}
@@ -315,10 +315,10 @@ void CPU::execute(uint8_t op){
 			if (this->v[x] == kk){ 
 				// Skip instruction
 				this->pc += 2;
-				printf("V%i: 0x%02x == 0x%02x\n", x, this->v[x], kk);
+				printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			} else {
 				// Do not skip instruction
-				printf("V%i: 0x%02x != 0x%02x\n", x, this->v[x], kk);
+				printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
 			}
 			break;
 		case Op::RET:
@@ -329,14 +329,14 @@ void CPU::execute(uint8_t op){
 			break;
 		case Op::RND: // RND Vx 
 			this->v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255
-			printf("RND V%i = 0x%02x\n", x, v[x]);
+			printf("RND V%zu = 0x%02x\n", x, v[x]);
 			break;
 		case Op::SYS: // Ignored
 			printf("\n");
 			break;
 		case Op::XOR: // Exclusive OR
 			// Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result in Vx.
-			printf("V%i = Vx ^ Vy = 0x%02x\n", x, this->v[x] ^ this->v[y]);
+			printf("V%zu = Vx ^ Vy = 0x%02x\n", x, this->v[x] ^ this->v[y]);
 			this->v[x] ^= this->v[y];
 			break;
 	}
@@ -365,8 +365,8 @@ void CPU::print_stack(){
 }
 void print_args(uint16_t opcode, size_t x, size_t y, uint8_t kk, uint16_t nnn, uint8_t n){
 	printf("opcode: 0x%04x\n", opcode);
-	printf("x: 0x%01x\n", x);
-	printf("y: 0x%01x\n", y);
+	printf("x: %zu\n", x);
+	printf("y: %zu\n", y);
 	printf("kk: 0x%02x\n", kk);
 	printf("nnn: 0x%03x\n", nnn);
 	printf("n: 0x%01x\n", n);

@@ -89,7 +89,7 @@ bool Chip8::LoadROM(const char* rom_path){
 	fseek(rom, 0, SEEK_END);
 	size_t rom_size = ftell(rom);
 	rewind(rom);
-	printf("ROM size: %i Bytes\n", rom_size);
+	printf("ROM size: %zu Bytes\n", rom_size);
 	// Allocate memory for rom 
 	uint8_t* rom_buf = (uint8_t*) malloc(rom_size);
 	// Read ROM into memory
