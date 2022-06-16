@@ -2,7 +2,7 @@
 
 To compile, either run the ``run.sh`` bash script, or use the ``make`` command.
 
-Currently, the IBM test ROM works! 
+Currently, the IBM test ROM, and the opcode test works! 
 
 Lots of opcodes among other things are still broken/not implemented yet though. 
 
@@ -12,7 +12,7 @@ Right now, I'm just verifying the graphics work by printing them into the termin
 
 ![ibm](images/ibm_test.png)
 
-![op-test](images/opcode_test.png)
+![op-test](images/op_test.png)
 
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)

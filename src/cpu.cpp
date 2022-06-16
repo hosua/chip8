@@ -176,9 +176,7 @@ void CPU::execute(uint8_t op){
 			this->stack[this->sp] = this->pc; // Put pc on top of the stack
 			this->sp++; // Increment stack pointer
 			this->pc = nnn; // Store address into program counter
-			// print_registers();
-			// print_args(opcode, x, y, kk, nnn, n);
-			// printf("WARNING: %s NOT IMPLEMENTED\n", opstr);
+			this->pc -= 2;
 			break;
 		case Op::CLS: // Clear screen
 			printf("%s\n", opstr);
@@ -247,7 +245,7 @@ void CPU::execute(uint8_t op){
 				case 0x6000: // 6xkk - Set Vx to kk
 					this->v[x] = kk;
 					printf("V%i 0x%02x\n", x, kk);
-					this->pc -= 2; // TODO: This is wrong but idk why the fuck im skipping an instruction
+					this->pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
 					break;
 				case 0x8000: // 8xy0 - Set Vx to Vy
 					this->v[x] = this->v[y];
@@ -324,6 +322,7 @@ void CPU::execute(uint8_t op){
 			}
 			break;
 		case Op::RET:
+			printf("top: 0x%04x\n", stack[sp]);
 			this->sp--;
 			this->pc = stack[sp];
 			// printf("WARNING: 0xEE RET is not implented yet!\n");

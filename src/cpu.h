@@ -11,7 +11,7 @@ class CPU {
 			this->mem = chip8->mem;
 		}
 
-		uint8_t stack[STACK_SIZE] = {0}; // The 64-byte stack
+		uint16_t stack[STACK_SIZE] = {0}; // The 64-byte stack
 		uint8_t sp = 0x0; // 8-bit Stack pointer
 		uint8_t v[NUM_VREGS] = {0}; // Vx registers
 		uint16_t i = 0x0; // 16-bit index register. Stores memory addresses
