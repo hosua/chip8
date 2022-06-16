@@ -12,7 +12,7 @@ Right now, I'm just verifying the graphics work by printing them into the termin
 
 ![ibm](images/ibm_test.png)
 
-![op-test](images/op_test.png)
+![op-test](images/opcode_test.png)
 
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
