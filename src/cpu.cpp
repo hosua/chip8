@@ -324,9 +324,9 @@ void CPU::execute(uint8_t op){
 			}
 			break;
 		case Op::RET:
-			// this->sp--;
-			// this->pc = stack[sp];
-			printf("WARNING: 0xEE RET is not implented yet!\n");
+			this->sp--;
+			this->pc = stack[sp];
+			// printf("WARNING: 0xEE RET is not implented yet!\n");
 			break;
 		case Op::RND: // RND Vx 
 			this->v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255

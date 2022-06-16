@@ -1,5 +1,7 @@
 **This is still a work in progress**
 
+To compile, either run the ``run.sh`` bash script, or use the ``make`` command.
+
 Currently, the IBM test ROM works! 
 
 Lots of opcodes among other things are still broken/not implemented yet though. 
@@ -8,8 +10,7 @@ I also have not done graphics yet, I probably will use SDL to display them at so
 
 Right now, I'm just verifying the graphics work by printing them into the terminal.
 
-![chip8-1](images/ibm_test.png)
-![chip8-2](images/opcode_test.png)
+![chip8](images/chip8.png)
 
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
