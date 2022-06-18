@@ -321,6 +321,9 @@ void CPU::execute(uint8_t op){
 				printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
 			}
 			break;
+		case Op::SKNP:
+			printf("Warning: op is not implemented yet!\n");
+			break;
 		case Op::RET:
 			printf("top: 0x%04x\n", stack[sp]);
 			this->sp--;
@@ -335,7 +338,7 @@ void CPU::execute(uint8_t op){
 			printf("\n");
 			break;
 		case Op::XOR: // Exclusive OR
-			// Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result in Vx.
+			// Performs a bitwise XOR on the values of Vx and Vy, then stores the result in Vx.
 			printf("V%zu = Vx ^ Vy = 0x%02x\n", x, this->v[x] ^ this->v[y]);
 			this->v[x] ^= this->v[y];
 			break;

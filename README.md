@@ -6,9 +6,7 @@ Currently, the IBM test ROM, and the opcode test works!
 
 Lots of opcodes among other things are still broken/not implemented yet though. 
 
-I also have not done graphics yet, I probably will use SDL to display them at some point, but I still need to learn how to do that. 
-
-Right now, I'm just verifying the graphics work by printing them into the terminal.
+To render the graphics, I am using SDL 2.0.
 
 ![ibm](images/ibm_test.png)
 

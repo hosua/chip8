@@ -29,6 +29,9 @@ OBJS := $(subst $(SOURCEDIR),$(BUILDDIR),$(SOURCES:.cpp=.o))
 # Define dependencies files for all objects
 DEPS = $(OBJS:.o=.d)
 
+# Compile flags
+CFLAGS = -Wall -lSDL2
+
 # Name the compiler
 CC = g++
 
@@ -61,7 +64,7 @@ endif
 define generateRules
 $(1)/%.o: %.cpp
 	$(HIDE)@echo Building $$@
-	$(CC) -c $$(INCLUDES) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD
+	$(CC) $(CFLAGS) -c $$(INCLUDES) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD
 endef
 
 .PHONY: all clean directories 
@@ -70,7 +73,7 @@ all: directories $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(HIDE)@echo Linking $@
-	$(CC) $(OBJS) -o $(TARGET)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
 
 # Include dependencies
 -include $(DEPS)
