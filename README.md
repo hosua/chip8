@@ -8,9 +8,7 @@ Lots of opcodes among other things are still broken/not implemented yet though.
 
 To render the graphics, I am using SDL 2.0.
 
-![ibm](images/ibm_test.png)
-
-![op-test](images/opcode_test.png)
+![SDL](images/SDL.png)
 
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
