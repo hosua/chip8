@@ -1,8 +1,10 @@
 [
  {
-  "directory": "/home/hosua/Desktop/Git/chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
   "arguments": [
    "g++",
+   "-Wall",
+   "-lSDL2",
    "-c",
    "-Isrc",
    "-o",
@@ -13,9 +15,11 @@
   "file": "src/chip8.cpp"
  },
  {
-  "directory": "/home/hosua/Desktop/Git/chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
   "arguments": [
    "g++",
+   "-Wall",
+   "-lSDL2",
    "-c",
    "-Isrc",
    "-o",
@@ -26,9 +30,11 @@
   "file": "src/cpu.cpp"
  },
  {
-  "directory": "/home/hosua/Desktop/Git/chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
   "arguments": [
    "g++",
+   "-Wall",
+   "-lSDL2",
    "-c",
    "-Isrc",
    "-o",
@@ -39,9 +45,11 @@
   "file": "src/display.cpp"
  },
  {
-  "directory": "/home/hosua/Desktop/Git/chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
   "arguments": [
    "g++",
+   "-Wall",
+   "-lSDL2",
    "-c",
    "-Isrc",
    "-o",

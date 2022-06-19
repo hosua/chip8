@@ -7,6 +7,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 
+#define DEBUG_MODE true
+
 int main(int argc, char *argv[]){
 	const char* rom_path = argv[1];
 	if (argc != 2){
@@ -49,7 +51,8 @@ int main(int argc, char *argv[]){
 		printf("Cycles: %zu\n", cycles);
 		cpu.cycle();
 		disp.DrawScreen(renderer, window);
-		// getchar(); // frame by frame execution (comment/uncomment this for debugging)
+		if (DEBUG_MODE)
+			getchar(); // frame by frame execution (comment/uncomment this for debugging)
 		
 	}
 

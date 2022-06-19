@@ -1,3 +1,12 @@
+# Issues
+The way I was unsetting pixels in SDL was horrible for performance, I need to do it a better way.
+
+opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
+
+# How to use
+
+If you do wish to use this currently broken emulator...
+
 From the ``run.sh`` script help menu:
 ```
 -c Compile Chip8 with make
@@ -9,8 +18,6 @@ From the ``run.sh`` script help menu:
 
 If you run this script without arguments, it will let you select a game from the ``games`` directory and run the CHIP8 emulator. 
 You must compile it with the ``-c`` flag first for it to work.
-
-
 
 **This is still a work in progress**
 

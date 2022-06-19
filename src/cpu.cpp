@@ -14,12 +14,7 @@ void CPU::cycle(){
 }
 
 uint8_t CPU::decode(uint16_t opcode){
-	uint8_t op;
-	uint8_t x = Op::x(opcode);
-	uint8_t y = Op::y(opcode);
-	uint8_t n = Op::n(opcode);
-	size_t nnn = Op::nnn(opcode);
-
+	uint8_t op = Op::ERR;
 	switch(opcode & 0xF000){
 		case 0x0000:
 			switch(opcode & 0x00FF){
@@ -148,7 +143,7 @@ void CPU::execute(uint8_t op){
 	uint8_t kk = Op::kk(opcode); // kk or byte - An 8-bit value, the lowest 8 bits of the instruction
 	uint16_t nnn = Op::nnn(opcode); // nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
 	uint8_t n = Op::n(opcode); // n or nibble - A 4-bit value, the lowest 4 bits of the instruction
-	uint8_t px; // For draw
+							   //
 	printf("0x%04x: 0x%04x ", this->pc, opcode);
 	printf("%s ", opstr);
 	switch(op){
@@ -173,8 +168,9 @@ void CPU::execute(uint8_t op){
 			}
 			break;
 		case Op::CALL: // Call subroutine
-			this->stack[this->sp] = this->pc; // Put pc on top of the stack
-			this->sp++; // Increment stack pointer
+			// this->stack[this->sp] = this->pc; // Put pc on top of the stack
+			// this->sp++; // Increment stack pointer
+			this->stack.push(this->pc);
 			this->pc = nnn; // Store address into program counter
 			this->pc -= 2;
 			break;
@@ -323,6 +319,7 @@ void CPU::execute(uint8_t op){
 			break;
 		case Op::SNE:
 			// Skip next instruction if Vx != kk
+			/*
 			if (this->v[x] != kk){
 				printf("SKIPPING\n");
 				this->pc += 2;
@@ -331,14 +328,20 @@ void CPU::execute(uint8_t op){
 				printf("NOT SKIPPING\n");
 				printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			}
+			*/
+			printf("WARNING: opcode not implemented yet\n");
+
 			break;
 		case Op::SKNP:
 			printf("Warning: op is not implemented yet!\n");
 			break;
 		case Op::RET:
-			printf("top: 0x%04x\n", stack[sp]);
-			this->sp--;
-			this->pc = stack[sp];
+			printf("top: 0x%04x\n", stack.top());
+			// printf("top: 0x%04x\n", stack[sp]);
+			this->pc = this->stack.top();
+			this->stack.pop();
+			// this->sp--;
+			// this->pc = stack[sp];
 			// printf("WARNING: 0xEE RET is not implented yet!\n");
 			break;
 		case Op::RND: // RND Vx 
@@ -362,7 +365,7 @@ void CPU::print_registers(){
 	for (int i = 0; i < NUM_VREGS; i++)
 		printf("%i: %02x ", i, this->v[i]);
 	printf("\n");
-	printf("sp: 0x%04x\n", this->sp);
+	// printf("sp: 0x%04x\n", this->sp);
 	printf("i: 0x%04x\n", this->i);
 	printf("pc: 0x%04x\n", this->pc);
 	printf("dt: 0x%02x\n", this->dt);
@@ -370,13 +373,6 @@ void CPU::print_registers(){
 	printf("------------\n");
 }
 
-void CPU::print_stack(){
-	printf("------------\n");
-	printf("stack:\n");
-	for (int i = 0; i < STACK_SIZE; i++)
-		printf("s[%i]: 0x%02x\n", i, this->stack[i]);
-	printf("------------\n");
-}
 void print_args(uint16_t opcode, size_t x, size_t y, uint8_t kk, uint16_t nnn, uint8_t n){
 	printf("opcode: 0x%04x\n", opcode);
 	printf("x: %zu\n", x);

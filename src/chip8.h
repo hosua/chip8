@@ -29,7 +29,7 @@ namespace Op {
 		SE, SNE, LD, ADD, LDR, 
 		OR, AND, XOR, SUB, SHR, 
 		SUBN, SHL, RND, DRW, SKP,
-		SKNP,
+		SKNP, ERR
 	};
 
 	const char* optostr(uint8_t op);

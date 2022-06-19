@@ -8,8 +8,8 @@ void Display::DrawPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Wind
     SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
 	// Create a 10x10 rectange (the pixel)
     SDL_Rect r;
-    r.x = (x) * PIXEL_SIZE;
-    r.y = (y) * PIXEL_SIZE;
+    r.x = x * PIXEL_SIZE;
+    r.y = y * PIXEL_SIZE;
 
     r.w = PIXEL_SIZE;
     r.h = PIXEL_SIZE;
@@ -25,6 +25,7 @@ void Display::ClearPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Win
     SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);
 	// Create a 10x10 rectange (the pixel)
     SDL_Rect r;
+    r.x = x * PIXEL_SIZE;
     r.y = y * PIXEL_SIZE;
 
     r.w = PIXEL_SIZE;
