@@ -19,7 +19,7 @@ and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for exampl
 
 Currently, the IBM test ROM, and the opcode test works! 
 
-Some opcodes are still broken/not implemented yet, keyboard input is still also needs to be done as well.
+Some opcodes are still broken/not implemented yet, keyboard input still also needs to be done as well.
 
 To render the graphics, I am using SDL 2.0, it still needs some work.
 
