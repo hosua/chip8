@@ -8,7 +8,7 @@ From the ``run.sh`` script help menu:
 ```
 
 If you run this script without arguments, it will let you select a game from the ``games`` directory and run the CHIP8 emulator. 
-You must compile it with the ``-c`` flag first for it to work."
+You must compile it with the ``-c`` flag first for it to work.
 
 
 
