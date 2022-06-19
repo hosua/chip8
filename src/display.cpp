@@ -8,8 +8,8 @@ void Display::DrawPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Wind
     SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
 	// Create a 10x10 rectange (the pixel)
     SDL_Rect r;
-    r.x = x * PIXEL_SIZE;
-    r.y = y * PIXEL_SIZE;
+    r.x = (x) * PIXEL_SIZE;
+    r.y = (y) * PIXEL_SIZE;
 
     r.w = PIXEL_SIZE;
     r.h = PIXEL_SIZE;
@@ -40,7 +40,7 @@ void Display::ClearPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Win
 const char* PX = "\u2588\u2588"; 
 
 void Display::DrawScreen(SDL_Renderer* renderer, SDL_Window* window){
-	uint16_t x_pos = 0;
+	uint16_t x_pos = 1;
 	uint16_t y_pos = 0;
 
 	if (chip8->draw_flag) {
@@ -51,16 +51,15 @@ void Display::DrawScreen(SDL_Renderer* renderer, SDL_Window* window){
 			} else {
 				ClearPixel(x_pos, y_pos, renderer, window);
 			}
-			if (((i) % DISP_X) == 0){
+			if (((i+1) % DISP_X) == 0){
 				y_pos++;
 				x_pos = 0;
 			}
 			x_pos++;
 		}
 		// Display graphics into terminal
-		/*
 		for (int i = 0; i < DISP_X*DISP_Y; i++){
-			if (screen[i]) {
+			if (chip8->gfx[i]) {
 				printf("%s", PX);
 			} else {
 				printf("  ");
@@ -69,7 +68,6 @@ void Display::DrawScreen(SDL_Renderer* renderer, SDL_Window* window){
 				printf("\n");
 			}
 		}
-		*/
 	}
 
 	

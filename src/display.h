@@ -8,8 +8,8 @@
 #include <chip8.h>
 #include <cpu.h>
 
-#define SCREEN_X 1280
-#define SCREEN_Y 640
+#define SCREEN_X 1320
+#define SCREEN_Y 680
 
 #define PIXEL_SIZE 20
 
@@ -19,7 +19,6 @@ extern const char* PX;
 class Display {
 public:
 	Chip8* chip8;
-	uint8_t screen[DISP_X * DISP_Y];
 	Display(Chip8* chip8){
 		this->chip8 = chip8;
 	}
