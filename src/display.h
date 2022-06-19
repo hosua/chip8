@@ -26,6 +26,7 @@ public:
   
 	void GetGfx();
 	void DrawPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Window *window);
+	void ClearPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Window *window);
 
 	void DrawScreen(SDL_Renderer* renderer, SDL_Window* window);
 };

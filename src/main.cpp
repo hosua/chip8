@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
 		printf("Cycles: %zu\n", cycles);
 		cpu.cycle();
 		disp.DrawScreen(renderer, window);
-		getchar(); // frame by frame execution (comment/uncomment this for debugging)
+		// getchar(); // frame by frame execution (comment/uncomment this for debugging)
 		
 	}
 
