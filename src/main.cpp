@@ -13,6 +13,8 @@ int main(int argc, char *argv[]){
 		printf("Error: Need to enter the path to the file as the argument\n");
 		return 0;
 	}
+
+	// SDL Rendering stuff
 	SDL_Renderer* renderer = NULL;
 	SDL_Window* window = SDL_CreateWindow("CHIP8", 
 										SDL_WINDOWPOS_CENTERED, 
@@ -30,6 +32,7 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 
+	// Chip8 initialization & cycles
 	printf("===============START================\n");
 	Chip8 chip8;
 	chip8.LoadROM(rom_path); // ROM must load before CPU is initialized
@@ -56,7 +59,6 @@ int main(int argc, char *argv[]){
     SDL_DestroyWindow(window);
     SDL_Quit();
 	
-	// draw();
 	return 1;
 } 
 

@@ -8,10 +8,10 @@
 #include <chip8.h>
 #include <cpu.h>
 
-#define SCREEN_X 640
-#define SCREEN_Y 320
+#define SCREEN_X 1280
+#define SCREEN_Y 640
 
-#define PIXEL_SIZE 10
+#define PIXEL_SIZE 20
 
 // A black square to draw on the terminal
 extern const char* PX;

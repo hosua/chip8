@@ -76,7 +76,7 @@ const char* Op::optostr(uint8_t op){
 		case DRW: return "DRW";
 		case SKP: return "SKP";
 		case SKNP: return "SKNP";
-		default: return "UNK";
+		default: return "NAN";
 	}
 	return "UWOTM8";
 }
