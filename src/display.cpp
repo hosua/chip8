@@ -45,16 +45,17 @@ void Display::DrawScreen(SDL_Renderer* renderer, SDL_Window* window){
 
 	if (chip8->draw_flag) {
 		chip8->draw_flag = false;
-		for (int i = 0; i < DISP_X*DISP_Y; i++, x_pos++){
+		for (int i = 0; i < DISP_X*DISP_Y; i++){
 			if (chip8->gfx[i]){
 				DrawPixel(x_pos, y_pos, renderer, window);
 			} else {
 				ClearPixel(x_pos, y_pos, renderer, window);
 			}
-			if (((i+1) % DISP_X) == 0){
+			if (((i) % DISP_X) == 0){
 				y_pos++;
 				x_pos = 0;
 			}
+			x_pos++;
 		}
 		// Display graphics into terminal
 		/*
