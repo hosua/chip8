@@ -266,7 +266,7 @@ void CPU::execute(uint8_t op){
 							break;
 						case 0x000A: // Fx0A - LD Vx, K
 									 // this->v[x] = get_key();
-							printf("%s Vx, k NOT IMPLEMENTED\n", opstr);
+							printf("Vx, k NOT IMPLEMENTED\n");
 							break;
 						case 0x0015: // Fx15 - LD DT, Vx
 							this->v[x] = this->dt;
@@ -313,12 +313,23 @@ void CPU::execute(uint8_t op){
 		case Op::SE:
 			// The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
 			if (this->v[x] == kk){ 
-				// Skip instruction
+				printf("SKIPPING\n");
 				this->pc += 2;
 				printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			} else {
-				// Do not skip instruction
+				printf("NOT SKIPPING\n");
 				printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
+			}
+			break;
+		case Op::SNE:
+			// Skip next instruction if Vx != kk
+			if (this->v[x] != kk){
+				printf("SKIPPING\n");
+				this->pc += 2;
+				printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
+			} else {
+				printf("NOT SKIPPING\n");
+				printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			}
 			break;
 		case Op::SKNP:
