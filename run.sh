@@ -1,4 +1,15 @@
+#!/bin/sh
 
+function usage(){
+	echo "-c Compile Chip8 with make
+-d Delete all build files (including executable) with make clean
+-y Compile with compiledb script for YCM syntax completion/checking
+-k Force kill CHIP8 
+-h This help menu
+
+If you run this script without arguments, it will let you select a game and run the CHIP8 emulator. 
+You must compile it with the -c flag first for it to work."
+}
 
 while getopts "cdyhk" o; do
     case "${o}" in
@@ -8,6 +19,7 @@ while getopts "cdyhk" o; do
 			;;
 		d) 
 			make clean
+			exit
 			;;
 		y)
 			compiledb make
@@ -18,13 +30,12 @@ while getopts "cdyhk" o; do
 			exit
 			;;
 		h)
-			echo "-c Compile Chip8 with make
--d Delete all build files (including executable) with make clean
--y Compile with compiledb script for YCM syntax completion/checking
--k Force kill CHIP8 
-
-If you run this script without arguments, it will let you select a game and run the CHIP8 emulator. 
-You must compile it with the -c flag first for it to work."
+			usage
+			exit
+			;;
+		*)
+			usage
+			exit
 			;;
     esac
 done
@@ -32,7 +43,8 @@ done
 EXEC="CHIP8"
 
 if [ -z "$(ls "$EXEC")" ]; then
-	echo "Exiting because the executable was not found in the directory."
+	usage
+	echo "Exiting because the executable was not in the directory."
 	exit
 fi
 

@@ -1,12 +1,27 @@
+From the ``run.sh`` script help menu:
+```
+-c Compile Chip8 with make
+-d Delete all build files (including executable) with make clean
+-y Compile with compiledb script for YCM syntax completion/checking
+-k Force kill CHIP8 
+-h This help menu
+```
+
+If you run this script without arguments, it will let you select a game from the ``games`` directory and run the CHIP8 emulator. 
+You must compile it with the ``-c`` flag first for it to work."
+
+
+
 **This is still a work in progress**
 
-To compile, either run the ``run.sh`` bash script, or use the ``make`` command.
+If you cannot use the ``run.sh`` script for whatever reason, you can compile the program with ``make``,
+and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for example.
 
 Currently, the IBM test ROM, and the opcode test works! 
 
-Lots of opcodes among other things are still broken/not implemented yet though. 
+Some opcodes are still broken/not implemented yet, keyboard input is still also needs to be done as well.
 
-To render the graphics, I am using SDL 2.0.
+To render the graphics, I am using SDL 2.0, it still needs some work.
 
 ![SDL](images/SDL.png)
 
