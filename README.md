@@ -3,6 +3,10 @@ The way I was unsetting pixels in SDL was horrible for performance, I need to do
 
 opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
 
+None of the games work although some do display what they are supposed to.
+
+Key inputs are not implemented yet either, I still need to learn how to do that.
+
 # How to use
 
 If you do wish to use this currently broken emulator...
