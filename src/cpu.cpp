@@ -4,7 +4,7 @@
 #include <cstdint> 
 #include <cstdio>
 
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 // Chip-8 instructions are 2 bytes (16-bits) long 
 void CPU::cycle(){
@@ -288,7 +288,7 @@ void CPU::execute(uint8_t op){
 							this->mem[this->i+2] = this->v[x] % 10; // Load 1s place into memory
 							break;
 						case 0x0055: // Fx55 - LD [I], Vx
-							for (int i = 0; i <= x; i++){
+							for (uint8_t i = 0; i <= x; i++){
 								// Stores from V0 to VX (including VX) into memory, starting at address I. The offset from I is increased by 1 for each value written, 
 								// but I itself is left unmodified.
 								if (DEBUG_MODE) printf("I -> V%zu\n", x);
@@ -299,7 +299,7 @@ void CPU::execute(uint8_t op){
 						case 0x0065: // Fx65 - LD Vx, [I]
 									 // Read from memory starting at address I into v registers
 							if (DEBUG_MODE) printf("LD V0-V%zu -> I\n", x);
-							for (int i = 0; i <= x; i++){
+							for (uint8_t i = 0; i <= x; i++){
 								this->v[i] = this->mem[this->i + i];
 							}
 

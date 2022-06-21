@@ -25,6 +25,9 @@ public:
 	}
   
 	void GetScreen();
+	SDL_Rect GetSetPixel(uint8_t x, uint8_t y, SDL_Renderer *renderer);
+	SDL_Rect GetUnsetPixel(uint8_t x, uint8_t y, SDL_Renderer *renderer);
+	SDL_Rect* SetPixels(SDL_Renderer *renderer);
 	void DrawPixel(uint8_t x, uint8_t y, SDL_Renderer *renderer);
 	void ClearPixel(uint8_t x, uint8_t y, SDL_Renderer *renderer);
 	void ClearScreen(SDL_Renderer* renderer);
