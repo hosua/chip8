@@ -50,7 +50,7 @@ int main(int argc, char *argv[]){
 		cycles++;
 		printf("Cycles: %zu\n", cycles);
 		cpu.cycle();
-		disp.DrawScreen(renderer, window);
+		disp.DrawScreen(renderer);
 		if (DEBUG_MODE)
 			getchar(); // frame by frame execution (comment/uncomment this for debugging)
 		

@@ -19,15 +19,17 @@ extern const char* PX;
 class Display {
 public:
 	Chip8* chip8;
+	uint8_t screen[DISP_X*DISP_X] = {0};
 	Display(Chip8* chip8){
 		this->chip8 = chip8;
 	}
   
-	void GetGfx();
-	void DrawPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Window *window);
-	void ClearPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer, SDL_Window *window);
+	void GetScreen();
+	void DrawPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer);
+	void ClearPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer);
+	void ClearScreen(SDL_Renderer* renderer);
 
-	void DrawScreen(SDL_Renderer* renderer, SDL_Window* window);
+	void DrawScreen(SDL_Renderer* renderer);
 };
 
 #endif

@@ -1,11 +1,5 @@
 # Issues
-The way I was unsetting pixels in SDL was horrible for performance, I need to do it a better way.
-
 opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
-
-None of the games work although some do display what they are supposed to.
-
-Key inputs are not implemented yet either, I still need to learn how to do that.
 
 # How to use
 
@@ -30,7 +24,9 @@ and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for exampl
 
 Currently, the IBM test ROM, and the opcode test works! 
 
-To render the graphics, I am using SDL 2.0, it still needs some work.
+Some opcodes are still broken/not implemented yet, keyboard input still also needs to be done as well.
+
+To render the graphics, I am using SDL 2.0.
 
 ![SDL](images/SDL.png)
 
