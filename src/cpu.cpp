@@ -4,6 +4,8 @@
 #include <cstdint> 
 #include <cstdio>
 
+#define DEBUG_MODE false
+
 // Chip-8 instructions are 2 bytes (16-bits) long 
 void CPU::cycle(){
 	// Fetch the next opcode (read 16 bits)
@@ -46,6 +48,7 @@ uint8_t CPU::decode(uint16_t opcode){
 			break;
 		case 0x7000: // 7xkk Vx, byte
 			op = Op::ADD; 
+
 			break;
 		case 0x8000:
 			switch(opcode & 0x000F){
@@ -102,7 +105,7 @@ uint8_t CPU::decode(uint16_t opcode){
 					op = Op::SKNP;
 					break;
 				default:
-					printf("Error: Invalid opcode: {%04x}\n", opcode);
+					if (DEBUG_MODE) printf("Error: Invalid opcode: {%04x}\n", opcode);
 					break;
 			}
 			break;
@@ -122,13 +125,13 @@ uint8_t CPU::decode(uint16_t opcode){
 					op = Op::ADD;
 					break;
 				default:
-					printf("Error: Invalid opcode: {%04x}\n", opcode);
+					if (DEBUG_MODE) printf("Error: Invalid opcode: {%04x}\n", opcode);
 					break;
 
 			}
 			break;
 		default:
-			printf("Error: Invalid opcode: {%04x}\n", opcode);
+			if (DEBUG_MODE) printf("Error: Invalid opcode: {%04x}\n", opcode);
 			break;
 	}
 	return op;
@@ -144,38 +147,36 @@ void CPU::execute(uint8_t op){
 	uint16_t nnn = Op::nnn(opcode); // nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
 	uint8_t n = Op::n(opcode); // n or nibble - A 4-bit value, the lowest 4 bits of the instruction
 							   //
-	printf("0x%04x: 0x%04x ", this->pc, opcode);
-	printf("%s ", opstr);
+	if (DEBUG_MODE) printf("0x%04x: 0x%04x ", this->pc, opcode);
+	if (DEBUG_MODE) printf("%s ", opstr);
 	switch(op){
 		default:
-			printf("\nError: Invalid opcode {%04x}\n", opcode);
+			if (DEBUG_MODE) printf("\nError: Invalid opcode {%04x}\n", opcode);
 			break;
 		case Op::ADD: 	// Add kk to Vx
 			switch(opcode & 0xF000){
 				case 0x7000: // ADD Vx, byte
 					this->v[x] += kk;
-					printf("ADD 0x%02x -> V%zu\n", kk, x);
+					if (DEBUG_MODE) printf("ADD 0x%02x -> V%zu\n", kk, x);
 					// print_registers();
 					break;
 				case 0x8000: // 8xy4 ADD Vx, Vy
 					this->v[y] += this->v[x]; 
-					printf("V%i V%i\n", this->v[x], this->v[y]);
+					if (DEBUG_MODE) printf("V%i V%i\n", this->v[x], this->v[y]);
 					break;
 				case 0x001E: // Fx1E ADD I = I + Vx
 					this->i += this->v[x];
-					printf("I, V%zu\n", x);
+					if (DEBUG_MODE) printf("I, V%zu\n", x);
 					break;
 			}
 			break;
 		case Op::CALL: // Call subroutine
-			// this->stack[this->sp] = this->pc; // Put pc on top of the stack
-			// this->sp++; // Increment stack pointer
 			this->stack.push(this->pc);
 			this->pc = nnn; // Store address into program counter
 			this->pc -= 2;
 			break;
 		case Op::CLS: // Clear screen
-			printf("%s\n", opstr);
+			if (DEBUG_MODE) printf("%s\n", opstr);
 			// Clear 64x32 display
 			for(int i = 0; i < DISP_X*DISP_Y; i++)
 				chip8->gfx[i] = 0;
@@ -184,23 +185,23 @@ void CPU::execute(uint8_t op){
 		case Op::JP: 
 			switch(opcode & 0xF000){
 				default:
-					printf("\nError: Invalid opcode {%04x}\n", opcode);
+					if (DEBUG_MODE) printf("\nError: Invalid opcode {%04x}\n", opcode);
 					break;
 				case 0x1000: // 1nnn - jump to address nnn
 					this->pc = nnn;
-					printf("0x%03x\n", nnn);
+					if (DEBUG_MODE) printf("0x%03x\n", nnn);
 					this->pc -= 2;
 					break;
 				case 0xB000: // Bnnn - jump to address nnn + v[0]
 					this->pc = nnn + v[0];
-					printf("0x%03x + 0x%03x\n", v[0], nnn);
+					if (DEBUG_MODE) printf("0x%03x + 0x%03x\n", v[0], nnn);
 					this->pc -= 2;
 					break;
 			}
 			break;
 		case Op::DRW:
 		{
-			printf("Vx: 0x%01x Vy: 0x%01x n: %i i: 0x%02x\n", this->v[x], this->v[y], n, this->i);
+			if (DEBUG_MODE) printf("Vx: 0x%01x Vy: 0x%01x n: %i i: 0x%02x\n", this->v[x], this->v[y], n, this->i);
 			/* Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. 
 			 * Each row of 8 pixels is read as bit-coded starting from memory location I; I value does not 
 			 * change after the execution of this instruction. As described above, VF is set to 1 if any 
@@ -221,11 +222,11 @@ void CPU::execute(uint8_t op){
 					// dx is the x position of the pixel in the line being drawn
 					if(px & (0x80 >> dx)){
 						// and if gfx is set
-						if(chip8->gfx[(this->v[x] + dx + ((this->v[y] + dy) * 64))]){
+						if(chip8->gfx[(this->v[x] + dx + ((this->v[y] + dy) * DISP_X))]){
 							// Set VF flag to 1 indicating that at least one pixel was unset
 							this->v[0xF] = 1;
 						}
-						chip8->gfx[this->v[x] + dx + ((this->v[y] + dy) * 64)] ^= 1;
+						chip8->gfx[this->v[x] + dx + ((this->v[y] + dy) * DISP_X)] ^= 1;
 					}
 				}
 			}
@@ -236,52 +237,52 @@ void CPU::execute(uint8_t op){
 		case Op::LD: 	
 			switch(opcode & 0xF000){
 				default:
-					printf("\nError: Invalid opcode {%04x}\n", opcode);
+					if (DEBUG_MODE) printf("\nError: Invalid opcode {%04x}\n", opcode);
 					break;
 				case 0x6000: // 6xkk - Set Vx to kk
 					this->v[x] = kk;
-					printf("V%zu 0x%02x\n", x, kk);
+					if (DEBUG_MODE) printf("V%zu 0x%02x\n", x, kk);
 					this->pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
 					break;
 				case 0x8000: // 8xy0 - Set Vx to Vy
 					this->v[x] = this->v[y];
-					printf("V%i V%i\n", this->v[x], this->v[y]);
+					if (DEBUG_MODE) printf("V%i V%i\n", this->v[x], this->v[y]);
 					break;
 				case 0xA000: // annn - Set i to address nnn
 					this->i = nnn;
-					printf("0x%03x -> I\n", nnn);
+					if (DEBUG_MODE) printf("0x%03x -> I\n", nnn);
 					break;
 				case 0xF000:
 					switch(opcode & 0x00FF){
 						default:
-							printf("\nError: Invalid opcode {%04x}\n", opcode);
+							if (DEBUG_MODE) printf("\nError: Invalid opcode {%04x}\n", opcode);
 							break;
 						case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
 							this->dt = this->v[x];
-							printf("V%zu DT\n", x);
+							if (DEBUG_MODE) printf("V%zu DT\n", x);
 							break;
 						case 0x000A: // Fx0A - LD Vx, K
 									 // this->v[x] = get_key();
-							printf("Vx, k NOT IMPLEMENTED\n");
+							if (DEBUG_MODE) printf("Vx, k NOT IMPLEMENTED\n");
 							break;
 						case 0x0015: // Fx15 - LD DT, Vx
 							this->v[x] = this->dt;
-							printf("V%zu\n", x);
+							if (DEBUG_MODE) printf("V%zu\n", x);
 							break;
 						case 0x0018: // Fx18 - LD ST, Vx
 							this->v[x] = this->st;
-							printf("V%zu\n", x);
+							if (DEBUG_MODE) printf("V%zu\n", x);
 							break;
 						case 0x0029: // Fx29 - LD F Vx -> I
 									 // The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
-							printf("F V%zu -> I\n", x);
+							if (DEBUG_MODE) printf("F V%zu -> I\n", x);
 							this->i = this->v[x] * 0x5; // Each font is 5 bytes wide (as shown in textfont) 
 							break;
 						case 0x0033: // Fx33 - LD B, Vx
 									 // TODO
 									 // Store BCD representation of Vx in mem locations I, I+1, and I+2.
 									 // BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
-							printf("LD B, V%zu\n", x);
+							if (DEBUG_MODE) printf("LD B, V%zu\n", x);
 							this->mem[this->i] = this->v[x] / 100; // Load 100s place into memory
 							this->mem[this->i+1] = (this->v[x] / 10) % 10; // Load 10s place into memory
 							this->mem[this->i+2] = this->v[x] % 10; // Load 1s place into memory
@@ -290,14 +291,14 @@ void CPU::execute(uint8_t op){
 							for (int i = 0; i <= x; i++){
 								// Stores from V0 to VX (including VX) into memory, starting at address I. The offset from I is increased by 1 for each value written, 
 								// but I itself is left unmodified.
-								printf("I -> V%zu\n", x);
+								if (DEBUG_MODE) printf("I -> V%zu\n", x);
 								this->mem[this->i + i] = this->v[i];
 							}
 							this->i += x + 1;
 							break;
 						case 0x0065: // Fx65 - LD Vx, [I]
 									 // Read from memory starting at address I into v registers
-							printf("LD V0-V%zu -> I\n", x);
+							if (DEBUG_MODE) printf("LD V0-V%zu -> I\n", x);
 							for (int i = 0; i <= x; i++){
 								this->v[i] = this->mem[this->i + i];
 							}
@@ -309,52 +310,49 @@ void CPU::execute(uint8_t op){
 		case Op::SE:
 			// The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
 			if (this->v[x] == kk){ 
-				printf("SKIPPING\n");
+				if (DEBUG_MODE) printf("SKIPPING\n");
 				this->pc += 2;
-				printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
+				if (DEBUG_MODE) printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			} else {
-				printf("NOT SKIPPING\n");
-				printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
+				if (DEBUG_MODE) printf("NOT SKIPPING\n");
+				if (DEBUG_MODE) printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
 			}
 			break;
 		case Op::SNE:
 			// Skip next instruction if Vx != kk
-			/*
 			if (this->v[x] != kk){
-				printf("SKIPPING\n");
+				if (DEBUG_MODE) printf("SKIPPING\n");
 				this->pc += 2;
-				printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
+				if (DEBUG_MODE) printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
 			} else {
-				printf("NOT SKIPPING\n");
-				printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
+				if (DEBUG_MODE) printf("NOT SKIPPING\n");
+				if (DEBUG_MODE) printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			}
-			*/
-			printf("WARNING: opcode not implemented yet\n");
+			// if (DEBUG_MODE) printf("WARNING: opcode not implemented yet\n");
 
 			break;
 		case Op::SKNP:
-			printf("Warning: op is not implemented yet!\n");
+			if (DEBUG_MODE) printf("Warning: op is not implemented yet!\n");
 			break;
 		case Op::RET:
-			printf("top: 0x%04x\n", stack.top());
-			// printf("top: 0x%04x\n", stack[sp]);
+			if (DEBUG_MODE) printf("top: 0x%04x\n", stack.top());
 			this->pc = this->stack.top();
 			this->stack.pop();
-			// this->sp--;
-			// this->pc = stack[sp];
-			// printf("WARNING: 0xEE RET is not implented yet!\n");
 			break;
 		case Op::RND: // RND Vx 
 			this->v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255
-			printf("RND V%zu = 0x%02x\n", x, v[x]);
+			if (DEBUG_MODE) printf("RND V%zu = 0x%02x\n", x, v[x]);
 			break;
 		case Op::SYS: // Ignored
-			printf("\n");
+			if (DEBUG_MODE) printf("\n");
 			break;
 		case Op::XOR: // Exclusive OR
 			// Performs a bitwise XOR on the values of Vx and Vy, then stores the result in Vx.
-			printf("V%zu = Vx ^ Vy = 0x%02x\n", x, this->v[x] ^ this->v[y]);
+			if (DEBUG_MODE) printf("V%zu = Vx ^ Vy = 0x%02x\n", x, this->v[x] ^ this->v[y]);
 			this->v[x] ^= this->v[y];
+			break;
+		case Op::ERR:
+			if (DEBUG_MODE) printf("You fucked up kid\n");
 			break;
 	}
 }

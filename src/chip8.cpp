@@ -76,7 +76,8 @@ const char* Op::optostr(uint8_t op){
 		case DRW: return "DRW";
 		case SKP: return "SKP";
 		case SKNP: return "SKNP";
-		default: return "UNK";
+		case ERR: return "ERR";
+		default: return "WTF";
 	}
 	return "UWOTM8";
 }
@@ -87,9 +88,9 @@ bool Chip8::LoadROM(const char* rom_path){
 	// Get length of file 
 	FILE* rom = fopen(rom_path, "rb");
 	fseek(rom, 0, SEEK_END);
-	size_t rom_size = ftell(rom);
+	uint16_t rom_size = ftell(rom);
 	rewind(rom);
-	printf("ROM size: %zu Bytes\n", rom_size);
+	printf("ROM size: %i Bytes\n", rom_size);
 	// Allocate memory for rom 
 	uint8_t* rom_buf = (uint8_t*) malloc(rom_size);
 	// Read ROM into memory
@@ -100,10 +101,8 @@ bool Chip8::LoadROM(const char* rom_path){
 	}	
 	// Load ROM into mem at 0x200
 	// Most Chip-8 programs start at location 0x200 (512), but some begin at 0x600 (1536). 
-	// Programs beginning at 0x600 are intended for the ETI 660 computer.
-	for (int i = 0; i < rom_size; i++){
-		this->mem[0x200 + i] = (uint8_t)rom_buf[i];
-	}
+	printf("BYTES: %zu\n", rom_size / sizeof(uint8_t));
+	memcpy(&this->mem[0x200], rom_buf, (rom_size / sizeof(uint8_t)));
 	free(rom_buf);
 	printf("Rom \"%s\" loaded into memory\n", rom_path);
 	return true;

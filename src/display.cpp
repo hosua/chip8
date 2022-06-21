@@ -3,7 +3,7 @@
 #include <cpu.h>
 
 // Draw pixel into renderer
-void Display::DrawPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer){
+void Display::DrawPixel(uint8_t x, uint8_t y, SDL_Renderer *renderer){
 	// Set render color to white ( rect will be rendered in this color )
     SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
 	// Create a 10x10 rectange (the pixel)
@@ -20,7 +20,7 @@ void Display::DrawPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer){
     SDL_RenderPresent(renderer);
 }
 
-void Display::ClearPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer){
+void Display::ClearPixel(uint8_t x, uint8_t y, SDL_Renderer *renderer){
 	// Set render color to white ( rect will be rendered in this color )
     SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0 );
 	// Create a 10x10 rectange (the pixel)
@@ -37,19 +37,9 @@ void Display::ClearPixel(uint16_t x, uint16_t y, SDL_Renderer *renderer){
     SDL_RenderPresent(renderer);
 }
 
-void Display::ClearScreen(SDL_Renderer* renderer){
-    SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0 );
-	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = DISP_X * PIXEL_SIZE + PIXEL_SIZE;
-	r.h = DISP_Y * PIXEL_SIZE + PIXEL_SIZE;
-	SDL_RenderFillRect(renderer, &r);
-	SDL_RenderPresent(renderer);
-}
-
 const char* PX = "\u2588\u2588";
 
+// Get chip8 gfx to display buffer
 void Display::GetScreen(){
 	memcpy(this->screen, chip8->gfx, DISP_X*DISP_Y * sizeof(uint8_t));
 }
@@ -64,7 +54,7 @@ void Display::DrawScreen(SDL_Renderer* renderer){
 				DrawPixel(x_pos, y_pos, renderer);
 			} else {
 				// Instead of clearing a pixel every time, we're using screen as a buffer to check
-				// if we actually have to unset it. Drawing rectangles is computationally expensive.
+				// if we actually have to unset it. Drawing unnecessary rectangles is computationally expensive.
 				if (this->screen[i]){
 					ClearPixel(x_pos, y_pos, renderer);
 				}

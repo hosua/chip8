@@ -1,5 +1,7 @@
 #!/bin/sh
 
+EXEC="CHIP8"
+
 function usage(){
 	echo "-c Compile Chip8 with make
 -d Delete all build files (including executable) with make clean
@@ -11,7 +13,8 @@ If you run this script without arguments, it will let you select a game and run 
 You must compile it with the -c flag first for it to work."
 }
 
-while getopts "cdyhk" o; do
+
+while getopts "cdyhkt" o; do
     case "${o}" in
 		# compile
         c)
@@ -19,7 +22,6 @@ while getopts "cdyhk" o; do
 			;;
 		d) 
 			make clean
-			exit
 			;;
 		y)
 			compiledb make
@@ -29,18 +31,18 @@ while getopts "cdyhk" o; do
 			echo "Force killed CHIP8"
 			exit
 			;;
+		t)
+			./$EXEC "games/TEST_OP"
+			exit
+			;;
 		h)
 			usage
-			exit
 			;;
 		*)
 			usage
-			exit
 			;;
     esac
 done
-
-EXEC="CHIP8"
 
 if [ -z "$(ls "$EXEC")" ]; then
 	usage
