@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
 	// for (int i = 0; i < num_cycles; i++){
 	size_t cycles = 0;
 	while(!quit){
-		Input::last_key = Input::PollKey();
+		Input::last_key = Input::PollKey(window);
 		cycles++;
 		cpu.cycle();
 		disp.RenderGFX(&num_pixels, renderer);

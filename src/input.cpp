@@ -49,7 +49,7 @@ namespace Input {
 	}
 
 	// Polls continuously in main and returns scancode of the key pressed
-	uint8_t PollKey(){
+	uint8_t PollKey(SDL_Window* window){
 		SDL_Event event;
 		SDL_PollEvent(&event);
 		SDL_KeyboardEvent *key = &event.key;
@@ -59,6 +59,12 @@ namespace Input {
 			{
 				if (Input::key_map.find(scancode) != key_map.end()){
 					Input::PrintKeyInfo(key);
+				}
+				if (scancode == SDL_SCANCODE_ESCAPE){
+					printf("Exiting... Goodbye!\n");
+					SDL_DestroyWindow(window);
+					SDL_Quit();
+					exit(1);
 				}
 				break;
 			}

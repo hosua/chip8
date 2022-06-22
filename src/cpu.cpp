@@ -5,7 +5,7 @@
 #include <cstdint> 
 #include <cstdio>
 
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 // Chip-8 instructions are 2 bytes (16-bits) long 
 void CPU::cycle(){
