@@ -5,7 +5,6 @@
 #define DEBUG_MODE false
 
 SDL_Rect Display::GetPixel(uint8_t x, uint8_t y){
-	// Set render color to white ( rect will be rendered in this color )
 	// Create a 10x10 rectangle (the pixel)
     SDL_Rect pixel;
     pixel.x = x * PIXEL_SIZE;
@@ -56,16 +55,16 @@ void Display::SetPixels(size_t* num_pixels, SDL_Renderer *renderer){
 		}
 	}
 
-	SDL_Rect* set_arr = new SDL_Rect[set_vect.size()];
+	SDL_Rect set_arr[set_vect.size()];
 	std::copy(set_vect.begin(), set_vect.end(), set_arr);
 
-	SDL_Rect* unset_arr = new SDL_Rect[unset_vect.size()];
+	SDL_Rect unset_arr[unset_vect.size()];
 	std::copy(unset_vect.begin(), unset_vect.end(), unset_arr);
 
-    SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	RenderPixels(renderer, set_arr, set_vect.size());
 
-    SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0 );
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	RenderPixels(renderer, unset_arr, unset_vect.size());
 	GetScreen();
 }
