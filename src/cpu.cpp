@@ -1,10 +1,11 @@
 #include <cpu.h>
 #include <chip8.h>
+#include <input.h>
 
 #include <cstdint> 
 #include <cstdio>
 
-#define DEBUG_MODE true
+#define DEBUG_MODE false
 
 // Chip-8 instructions are 2 bytes (16-bits) long 
 void CPU::cycle(){
@@ -262,7 +263,14 @@ void CPU::execute(uint8_t op){
 							if (DEBUG_MODE) printf("V%zu DT\n", x);
 							break;
 						case 0x000A: // Fx0A - LD Vx, K
-									 // this->v[x] = get_key();
+							// TODO:	
+							// Input::PollKey();
+							/*
+							if (Input::last_key < 0x10)
+								this->v[x] = Input::GetKeyRegister(Input::last_key);
+							else
+								if (DEBUG_MODE) printf("Last key pressed was not mapped\n");
+							*/
 							if (DEBUG_MODE) printf("Vx, k NOT IMPLEMENTED\n");
 							break;
 						case 0x0015: // Fx15 - LD DT, Vx
@@ -279,7 +287,6 @@ void CPU::execute(uint8_t op){
 							this->i = this->v[x] * 0x5; // Each font is 5 bytes wide (as shown in textfont) 
 							break;
 						case 0x0033: // Fx33 - LD B, Vx
-									 // TODO
 									 // Store BCD representation of Vx in mem locations I, I+1, and I+2.
 									 // BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
 							if (DEBUG_MODE) printf("LD B, V%zu\n", x);
@@ -330,6 +337,18 @@ void CPU::execute(uint8_t op){
 			}
 			// if (DEBUG_MODE) printf("WARNING: opcode not implemented yet\n");
 
+			break;
+		case Op::SKP: // Ex9E - SKP Vx 
+			// Skip next instruction if last key pressed = v[x]
+			/*
+			if (this->v[x] == Input::GetKeyRegister(Input::last_key)){
+				if (DEBUG_MODE) printf("SKIPPING, Vx == K\n");
+				this->pc += 2;
+			} else {
+				if (DEBUG_MODE) printf("NOT SKIPPING, Vx != K\n");
+			}
+			*/
+			if (DEBUG_MODE) printf("Warning: op is not implemented yet!\n");
 			break;
 		case Op::SKNP:
 			if (DEBUG_MODE) printf("Warning: op is not implemented yet!\n");
