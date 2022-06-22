@@ -1,5 +1,6 @@
 # Issues
 opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
+Keyboard input not yet implemented
 
 # How to use
 
@@ -22,7 +23,7 @@ You must compile it with the ``-c`` flag first for it to work.
 If you cannot use the ``run.sh`` script for whatever reason, you can compile the program with ``make``,
 and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for example.
 
-Currently, the IBM test ROM, and the opcode test works! 
+Currently, the IBM test ROM works, some games partially work, but obviously aren't playable until I figure out keyboard input.
 
 Some opcodes are still broken/not implemented yet, keyboard input still also needs to be done as well.
 
