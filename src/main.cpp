@@ -69,7 +69,7 @@ int main(int argc, char *argv[]){
 	
 	SDL_Event event;
 	bool quit = false;
-	
+	size_t num_pixels = 0;	
 	// size_t num_cycles = 50;
 	// for (int i = 0; i < num_cycles; i++){
 	size_t cycles = 0;
@@ -90,7 +90,8 @@ int main(int argc, char *argv[]){
 		cycles++;
 		// printf("Cycles: %zu\n", cycles);
 		cpu.cycle();
-		disp.DrawScreen(renderer);
+		// disp.DrawScreen(renderer);
+		disp.SetPixels(&num_pixels, renderer);
 		if (DEBUG_MODE){
 			cpu.print_registers();
 			// frame by frame execution 
