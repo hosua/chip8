@@ -29,6 +29,8 @@ Some opcodes are still broken/not implemented yet, keyboard input still also nee
 
 To render the graphics, I am using SDL 2.0.
 
+![UFO](images/chip8-1.gif)
+![CONNECT4](images/chip8-2.gif)
 ![SDL](images/SDL.png)
 
 # Resources used
