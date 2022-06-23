@@ -4,6 +4,8 @@
 #include <chip8.h>
 #include <stack>
 
+
+
 class CPU {
 	public:
 		Chip8* chip8;
@@ -25,6 +27,8 @@ class CPU {
 
 		// Fetches 2-byte (16-bit) instructions
 		void cycle();
+		// Counts down dt when it is non-zero
+		void clock();
 		uint8_t decode(uint16_t opcode);
 
 		// Execute CPU instructions

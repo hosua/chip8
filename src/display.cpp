@@ -2,7 +2,7 @@
 #include <display.h>
 #include <cpu.h>
 
-#define DEBUG_MODE true
+#define DEBUG_MODE false
 
 const char* PX = "\u2588\u2588";
 

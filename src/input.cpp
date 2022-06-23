@@ -1,11 +1,12 @@
 #include <input.h>
+#include <display.h>
 
 
 
 namespace Input {
 	// a global variable to store the last key pressed
 	uint8_t last_key = 0;
-	// map<scancode, register>
+	// key_map<scancode, register>
 	std::map<uint8_t, uint8_t> key_map = {
 		{0x1E, 0x1}, {0x1F, 0x2}, {0x20, 0x3}, {0x21, 0xC},
 		{0x14, 0x4}, {0x1A, 0x5}, {0x08, 0x6}, {0x15, 0xD},
@@ -42,23 +43,27 @@ namespace Input {
 		uint8_t v_reg = 0x10;
 		std::map<uint8_t, uint8_t>::iterator itr;	
 		itr = key_map.find(scancode);
-		if (itr != key_map.end())
+		if (itr != key_map.end()){
 			v_reg = key_map[scancode];
-
+			printf("v_reg: 0x%01x ", v_reg);
+		}
 		return v_reg;
 	}
 
 	// Polls continuously in main and returns scancode of the key pressed
-	uint8_t PollKey(SDL_Window* window){
+	void PollKey(){
 		SDL_Event event;
 		SDL_PollEvent(&event);
 		SDL_KeyboardEvent *key = &event.key;
 		uint8_t scancode = key->keysym.scancode;
 		switch (event.type){
+			case SDL_KEYDOWN:
 			case SDL_KEYUP:
 			{
 				if (Input::key_map.find(scancode) != key_map.end()){
 					Input::PrintKeyInfo(key);
+					// Store last key pressed in global
+					Input::last_key = GetKeyRegister(scancode);
 				}
 				if (scancode == SDL_SCANCODE_ESCAPE){
 					printf("Exiting... Goodbye!\n");
@@ -73,6 +78,5 @@ namespace Input {
 				break;
 			}
 		}
-		return scancode;
 	}
 }

@@ -11,6 +11,14 @@
 
 #define DEBUG_MODE false
 
+SDL_Window* window = SDL_CreateWindow("CHIP8", 
+									SDL_WINDOWPOS_CENTERED, 
+									SDL_WINDOWPOS_CENTERED, 
+									SCREEN_X, 
+									SCREEN_Y, 
+									0
+								  );
+
 int main(int argc, char *argv[]){
 	const char* rom_path = argv[1];
 	if (argc != 2){
@@ -19,13 +27,6 @@ int main(int argc, char *argv[]){
 	}
 	// SDL Rendering stuff
 	SDL_Renderer* renderer = NULL;
-	SDL_Window* window = SDL_CreateWindow("CHIP8", 
-										SDL_WINDOWPOS_CENTERED, 
-										SDL_WINDOWPOS_CENTERED, 
-										SCREEN_X, 
-										SCREEN_Y, 
-										0
-									  );
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]){
 	// for (int i = 0; i < num_cycles; i++){
 	size_t cycles = 0;
 	while(!quit){
-		Input::last_key = Input::PollKey(window);
+		Input::PollKey();
 		cycles++;
 		cpu.cycle();
 		disp.RenderGFX(&num_pixels, renderer);
@@ -59,6 +60,8 @@ int main(int argc, char *argv[]){
 			// frame by frame execution 
 			getchar(); 
 		}
+		// Count down dt if it is non-zero
+		cpu.clock();
 		
 	}
 

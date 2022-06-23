@@ -58,5 +58,20 @@
    "-MMD"
   ],
   "file": "src/main.cpp"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
+  "arguments": [
+   "g++",
+   "-Wall",
+   "-lSDL2",
+   "-c",
+   "-Isrc",
+   "-o",
+   "build/input.o",
+   "src/input.cpp",
+   "-MMD"
+  ],
+  "file": "src/input.cpp"
  }
 ]

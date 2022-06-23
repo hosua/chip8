@@ -10,5 +10,5 @@ namespace Input {
 
 	void PrintKeyInfo(SDL_KeyboardEvent *key);
 	uint8_t GetKeyRegister(uint8_t scancode);
-	uint8_t PollKey(SDL_Window* window);
+	void PollKey();
 }

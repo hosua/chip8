@@ -2,10 +2,17 @@
 #include <chip8.h>
 #include <input.h>
 
-#include <cstdint> 
-#include <cstdio>
+// For timer
+#ifdef __linux__
+#include <unistd.h>
+#endif
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #define DEBUG_MODE true
+// 1/60 = 0.16666666 * 10^6 =~ 16667
+#define TICK 16667
 
 // Chip-8 instructions are 2 bytes (16-bits) long 
 void CPU::cycle(){
@@ -14,6 +21,13 @@ void CPU::cycle(){
 	uint8_t op = decode(this->opcode);
 	execute(op);
 	this->pc += 2; // increment program counter
+}
+
+// Counts down dt when it is non-zero (60Hz, i.e. 1/60 seconds per tick)
+void CPU::clock(){
+	if (this->dt)
+		for ( ; this->dt; this->dt--) 
+			usleep(TICK);
 }
 
 uint8_t CPU::decode(uint16_t opcode){
@@ -265,13 +279,13 @@ void CPU::execute(uint8_t op){
 						case 0x000A: // Fx0A - LD Vx, K
 							// TODO:	
 							// Input::PollKey();
-							/*
+							//
 							if (Input::last_key < 0x10)
 								this->v[x] = Input::GetKeyRegister(Input::last_key);
 							else
 								if (DEBUG_MODE) printf("Last key pressed was not mapped\n");
-							*/
 							if (DEBUG_MODE) printf("Vx, k NOT IMPLEMENTED\n");
+							Input::last_key = 0x10;
 							break;
 						case 0x0015: // Fx15 - LD DT, Vx
 							this->v[x] = this->dt;
@@ -340,18 +354,27 @@ void CPU::execute(uint8_t op){
 			break;
 		case Op::SKP: // Ex9E - SKP Vx 
 			// Skip next instruction if last key pressed = v[x]
-			/*
 			if (this->v[x] == Input::GetKeyRegister(Input::last_key)){
 				if (DEBUG_MODE) printf("SKIPPING, Vx == K\n");
 				this->pc += 2;
 			} else {
 				if (DEBUG_MODE) printf("NOT SKIPPING, Vx != K\n");
 			}
-			*/
-			if (DEBUG_MODE) printf("Warning: op is not implemented yet!\n");
+			// Unset last key
+			Input::last_key = 0x10;
+			// if (DEBUG_MODE) printf("Warning: op is not implemented yet!\n");
 			break;
 		case Op::SKNP:
-			if (DEBUG_MODE) printf("Warning: op is not implemented yet!\n");
+			if (DEBUG_MODE) printf("Last key: 0x%01x\n", Input::last_key);
+			if (this->v[x] != Input::GetKeyRegister(Input::last_key)){
+				if (DEBUG_MODE) printf("SKIPPING, Vx == K\n");
+				this->pc += 2;
+			} else {
+				if (DEBUG_MODE) printf("NOT SKIPPING, Vx != K\n");
+			}
+			// Unset last key
+			Input::last_key = 0x10;
+			// if (DEBUG_MODE) printf("Warning: op is not implemented yet!\n");
 			break;
 		case Op::RET:
 			if (DEBUG_MODE) printf("top: 0x%04x\n", stack.top());

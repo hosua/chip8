@@ -15,6 +15,7 @@
 
 // A black square to draw on the terminal
 extern const char* PX;
+extern SDL_Window* window;
 
 class Display {
 public:
