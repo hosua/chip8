@@ -1,6 +1,6 @@
 # Issues
 - opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
-- Keyboard input not yet implemented
+- Keyboard input is not implemented very well at the moment.
 
 # How to use
 
