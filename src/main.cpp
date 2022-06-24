@@ -1,15 +1,15 @@
+#define DEBUG_MODE false
 
 #include <chip8.h>
 #include <cpu.h>
 #include <display.h>
 #include <input.h>
+#include <clock.h>
 
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
-
-#define DEBUG_MODE false
 
 SDL_Window* window = SDL_CreateWindow("CHIP8", 
 									SDL_WINDOWPOS_CENTERED, 
@@ -38,11 +38,10 @@ int main(int argc, char *argv[]){
 
 	// Chip8 initialization & cycles
 	printf("===============START================\n");
-	Chip8 chip8;
-	chip8.LoadROM(rom_path); // ROM must load before CPU is initialized
-	CPU cpu(&chip8);
+	Clock clock;
+	Chip8 chip8(rom_path); 
+	CPU cpu(&chip8, &clock); 
 	Display disp(&chip8);
-	chip8.print_display();
 	
 	bool quit = false;
 	size_t num_pixels = 0;	
@@ -50,7 +49,7 @@ int main(int argc, char *argv[]){
 	// for (int i = 0; i < num_cycles; i++){
 	size_t cycles = 0;
 	while(!quit){
-		Input::PollKey();
+		// InputHandler::PollKey(&chip8);
 		cycles++;
 		cpu.cycle();
 		disp.RenderGFX(&num_pixels, renderer);
@@ -61,12 +60,9 @@ int main(int argc, char *argv[]){
 			getchar(); 
 		}
 		// Count down dt if it is non-zero
-		cpu.clock();
-		
+		cpu.delay_timer();
+		clock.tick();
 	}
-
-    // Wait for 5 sec
-    SDL_Delay(5000);
 
     SDL_DestroyWindow(window);
     SDL_Quit();

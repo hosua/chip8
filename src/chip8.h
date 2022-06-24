@@ -18,6 +18,9 @@
 #define DISP_Y 32
 #define SPRITE_WIDTH 8
 
+// 1/60 = 0.16666666 * 10^6 =~ 16667
+#define TICK 16667
+
 class Chip8;
 
 // See section 2.4 - Display
@@ -55,25 +58,25 @@ namespace Op {
 
 class Chip8 {
 	public:
+		uint8_t mem[MEM_SIZE] = {0}; // mem of the chip8
+		uint8_t gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
+		bool key[NUM_KEYS] = {0}; // array of all keys from 0-F, 1 if pressed, 0 if unpressed
+		bool draw_flag = false; // draw flag
+
 		Chip8(){
 			srand(time(0)); // Init RNG
+			LoadFont(textfont);
 		}
+
 		Chip8(const char* rom_path){
 			srand(time(0)); // Init RNG
 			LoadFont(textfont);
 			LoadROM(rom_path);
 		}
-		uint8_t mem[MEM_SIZE] = {0}; // mem of the chip8
-		uint8_t gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
-		uint8_t keys[NUM_KEYS] = {0};
-		bool draw_flag = false; // draw flag
 
 		bool LoadROM(const char* rom_path);
 		// Load font set into memory
 		void LoadFont(uint8_t* font);
-		void print_display();
-		void fill_gfx();
-		void print_test();
 		
 };
 

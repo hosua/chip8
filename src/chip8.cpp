@@ -115,26 +115,4 @@ void Chip8::LoadFont(uint8_t* font){
 	}
 }
 
-void Chip8::print_display(){
-	for (int i = 0; i < DISP_X*DISP_Y; i++){
-		if (gfx[i] == 1){
-			printf("%s", PX);
-		}		
-		if (((i+1) % DISP_X) == 0){
-			printf("\n");
-		}
-	}
-}
-
-void Chip8::fill_gfx(){
-	for (int i = 0; i < DISP_X*DISP_Y; i++){
-		this->gfx[i] = 1;
-	}
-}
-
-void Chip8::print_test(){
-	fill_gfx();
-	print_display();
-}
-
 

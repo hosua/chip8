@@ -1,6 +1,11 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#define VERBOSE_DISPLAY false
+
+// A black square to draw on the terminal
+#define PX "\u2588\u2588"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
@@ -13,17 +18,13 @@
 
 #define PIXEL_SIZE 20
 
-// A black square to draw on the terminal
-extern const char* PX;
 extern SDL_Window* window;
 
 class Display {
 public:
 	Chip8* chip8;
 
-	Display(Chip8* chip8){
-		this->chip8 = chip8;
-	}
+	Display(Chip8* chip8) : chip8(chip8) {}
   
 	SDL_Rect GetPixel(uint8_t x, uint8_t y);
 	void RenderGFX(size_t* num_pixels, SDL_Renderer *renderer);

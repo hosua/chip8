@@ -1,6 +1,6 @@
 # Issues
-- opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
-- Keyboard input is not implemented very well at the moment.
+opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
+Keyboard input not yet implemented
 
 # How to use
 
@@ -29,8 +29,6 @@ Some opcodes are still broken/not implemented yet, keyboard input still also nee
 
 To render the graphics, I am using SDL 2.0.
 
-![UFO](images/chip8-1.gif)
-![CONNECT4](images/chip8-2.gif)
 ![SDL](images/SDL.png)
 
 # Resources used

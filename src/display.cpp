@@ -2,10 +2,6 @@
 #include <display.h>
 #include <cpu.h>
 
-#define DEBUG_MODE false
-
-const char* PX = "\u2588\u2588";
-
 SDL_Rect Display::GetPixel(uint8_t x, uint8_t y){
 	// Create a 10x10 rectangle (the pixel)
     SDL_Rect pixel;
@@ -38,7 +34,7 @@ void Display::RenderGFX(size_t* num_pixels, SDL_Renderer *renderer){
 		}
 
 		// Display graphics into terminal
-		if (DEBUG_MODE){
+		if (VERBOSE_DISPLAY){
 			for (int i = 0; i < DISP_X*DISP_Y; i++){
 				if (chip8->gfx[i]) {
 					printf("%s", PX);
