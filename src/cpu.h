@@ -5,8 +5,6 @@
 #include <clock.h>
 #include <stack>
 
-#define VERBOSE_CPU false
-
 class CPU {
 	public:
 		std::stack<uint16_t> stack;

@@ -274,15 +274,17 @@ void CPU::execute(uint8_t op){
 							break;
 						case 0x000A: // Fx0A - LD Vx, K
 						{
-							// TODO:
+							// TODO: Need to think about how we're going to do this.
 							// Wait for keypress, then store value of key in Vx
-							InputHandler::PollKeyUntilEvent();
-							//
+							/*
 							if (G_last_key_pressed < 0x10)
 								this->v[x] = InputHandler::GetKeyRegister(G_last_key_pressed);
 							else
 								if (VERBOSE_CPU) printf("Last key pressed was not mapped\n");
-							if (VERBOSE_CPU) printf("Vx, k NOT IMPLEMENTED\n");
+							*/
+						 	if (VERBOSE_CPU) printf("V%zu, K\n", x);
+							this->v[x] = InputHandler::WaitForKeyPress();
+							// if (VERBOSE_CPU) printf("Vx, k NOT IMPLEMENTED\n");
 							break;
 						}
 						case 0x0015: // Fx15 - LD DT, Vx
@@ -330,8 +332,8 @@ void CPU::execute(uint8_t op){
 		case Op::SE:
 			// The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
 			if (this->v[x] == kk){ 
-				if (VERBOSE_CPU) printf("SKIPPING\n");
 				this->pc += 2;
+				if (VERBOSE_CPU) printf("SKIPPING\n");
 				if (VERBOSE_CPU) printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			} else {
 				if (VERBOSE_CPU) printf("NOT SKIPPING\n");
@@ -342,38 +344,31 @@ void CPU::execute(uint8_t op){
 		{
 			// Skip next instruction if Vx != kk
 			if (this->v[x] != kk){
-				if (VERBOSE_CPU) printf("SKIPPING\n");
 				this->pc += 2;
+				if (VERBOSE_CPU) printf("SKIPPING\n");
 				if (VERBOSE_CPU) printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
 			} else {
 				if (VERBOSE_CPU) printf("NOT SKIPPING\n");
 				if (VERBOSE_CPU) printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 			}
-			// if (VERBOSE_CPU) printf("WARNING: opcode not implemented yet\n");
-
 			break;
 		}
-		case Op::SKP: // Ex9E - SKP Vx 
+		case Op::SKP: // Ex9E - SKP Vx "Skip if pressed"
 		{
-			// TODO:
 			// Skip next instruction if key with value of Vx is pressed
-			G_last_key_pressed = InputHandler::PollKeyFor(1); // "Poll key for 1 tick"
-
-			if (this->v[x] == InputHandler::GetKeyRegister(G_last_key_pressed)){
-				if (VERBOSE_CPU) printf("SKIPPING, Vx == K\n");
+			if (chip8->keys[this->v[x]]){ // If key is pressed
 				this->pc += 2;
+				if (VERBOSE_CPU) printf("SKIPPING, Vx == K\n");
+				if (VERBOSE_INPUT) InputHandler::PrintChip8Keys(chip8);
 			} else {
 				if (VERBOSE_CPU) printf("NOT SKIPPING, Vx != K\n");
 			}
 			// if (VERBOSE_CPU) printf("Warning: op is not implemented yet!\n");
 			break;
 		}
-		case Op::SKNP:
+		case Op::SKNP: // ExA1 - SKNP Vx "Skip if not pressed"
 		{
-			// TODO:
-			G_last_key_pressed = InputHandler::PollKeyFor(1);
-			if (VERBOSE_CPU) printf("Last key: 0x%01x\n", G_last_key_pressed);
-			if (this->v[x] != InputHandler::GetKeyRegister(G_last_key_pressed)){
+			if (!chip8->keys[this->v[x]]){ // If key is not pressed
 				if (VERBOSE_CPU) printf("SKIPPING, Vx == K\n");
 				this->pc += 2;
 			} else {
@@ -382,12 +377,12 @@ void CPU::execute(uint8_t op){
 			// if (VERBOSE_CPU) printf("Warning: op is not implemented yet!\n");
 			break;
 		}
-		case Op::RET:
+		case Op::RET: // 00EE - RET "Return"
 			if (VERBOSE_CPU) printf("top: 0x%04x\n", stack.top());
 			this->pc = this->stack.top();
 			this->stack.pop();
 			break;
-		case Op::RND: // RND Vx 
+		case Op::RND: // RND Vx "Random"
 			this->v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255
 			if (VERBOSE_CPU) printf("RND V%zu = 0x%02x\n", x, v[x]);
 			break;

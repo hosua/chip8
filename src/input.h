@@ -8,15 +8,13 @@
 
 #include <chip8.h>
 
-
-extern uint8_t G_last_key_pressed;
-
 namespace InputHandler {
+	void PrintChip8Keys(Chip8* chip8);
 	void PrintKeyInfo(SDL_KeyboardEvent *key);
+	void GetChip8Keys(Chip8* chip8);
+	uint8_t WaitForKeyPress();
 	uint8_t GetKeyRegister(uint8_t scancode);
-	void PollKey(uint8_t* last_key_pressed);
-	uint8_t PollKeyFor(uint16_t num_ticks);
-	void PollKeyUntilEvent();
+	void PollKey();
 }
 
 #endif

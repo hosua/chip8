@@ -6,7 +6,6 @@
 uint64_t G_ticks_elapsed = 0;
 // TICK is the constant time representing the length of each tick in microseconds. 
 
-// https://stackoverflow.com/questions/45442963/how-to-execute-a-while-loop-for-exactly-60-seconds-in-c
 void Clock::tick(){
 	if (steady_clock::now() - tick_start > std::chrono::microseconds(TICK)){
 		G_ticks_elapsed++;		

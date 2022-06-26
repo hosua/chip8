@@ -1,6 +1,9 @@
 # Issues
 opcode test looks like it works, but it shows OK opcodes when they aren't implemented yet too.
-Keyboard input not yet implemented
+
+Keyboard input isn't working perfectly yet, but it's much better now.
+
+**This is still a work in progress**
 
 # How to use
 
@@ -11,14 +14,14 @@ From the ``run.sh`` script help menu:
 -c Compile Chip8 with make
 -d Delete all build files (including executable) with make clean
 -y Compile with compiledb script for YCM syntax completion/checking
--k Force kill CHIP8 
+-k Force kill CHIP8
+-t Run test ROM
 -h This help menu
 ```
 
-If you run this script without arguments, it will let you select a game from the ``games`` directory and run the CHIP8 emulator. 
-You must compile it with the ``-c`` flag first for it to work.
+You must compile the program with the ``-c`` flag first for it to work.
 
-**This is still a work in progress**
+If you run this script without arguments, it will let you select a game from the ``games`` directory and run the CHIP8 emulator. It will also perform the selection if it detects a compiled copy of the CHIP8 in the directory
 
 If you cannot use the ``run.sh`` script for whatever reason, you can compile the program with ``make``,
 and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for example.
@@ -28,8 +31,10 @@ Currently, the IBM test ROM works, some games partially work, but obviously aren
 Some opcodes are still broken/not implemented yet, keyboard input still also needs to be done as well.
 
 To render the graphics, I am using SDL 2.0.
-
-![SDL](images/SDL.png)
+![opcode-test](images/opcode_test.png)
+![invaders](images/invaders.gif)
+![connect-4](images/connect_4.gif)
+![UFO](images/ufo.gif)
 
 # Resources used
 [devernay](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)

@@ -1,8 +1,6 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#define VERBOSE_DISPLAY false
-
 // A black square to draw on the terminal
 #define PX "\u2588\u2588"
 

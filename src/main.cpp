@@ -1,5 +1,3 @@
-#define DEBUG_MODE false
-
 #include <chip8.h>
 #include <cpu.h>
 #include <display.h>
@@ -11,6 +9,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 
+
 SDL_Window* window = SDL_CreateWindow("CHIP8", 
 									SDL_WINDOWPOS_CENTERED, 
 									SDL_WINDOWPOS_CENTERED, 
@@ -20,6 +19,7 @@ SDL_Window* window = SDL_CreateWindow("CHIP8",
 								  );
 
 int main(int argc, char *argv[]){
+	Chip8 chip8;
 	const char* rom_path = argv[1];
 	if (argc != 2){
 		printf("Error: Need to enter the path to the file as the argument\n");
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
 	// Chip8 initialization & cycles
 	printf("===============START================\n");
 	Clock clock;
-	Chip8 chip8(rom_path); 
+	chip8.LoadROM(rom_path);
 	CPU cpu(&chip8, &clock); 
 	Display disp(&chip8);
 	
@@ -49,15 +49,15 @@ int main(int argc, char *argv[]){
 	// for (int i = 0; i < num_cycles; i++){
 	size_t cycles = 0;
 	while(!quit){
-		// InputHandler::PollKey(&chip8);
+		InputHandler::GetChip8Keys(&chip8);
 		cycles++;
 		cpu.cycle();
 		disp.RenderGFX(&num_pixels, renderer);
 		if (DEBUG_MODE){
 			printf("Cycles: %zu\n", cycles);
 			// cpu.print_registers();
-			// frame by frame execution 
-			getchar(); 
+			// Execute each frame only when pressing a valid chip8 key
+			InputHandler::WaitForKeyPress();
 		}
 		// Count down dt if it is non-zero
 		cpu.delay_timer();

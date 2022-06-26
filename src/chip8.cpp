@@ -31,7 +31,7 @@ const char* Op::optostr(uint8_t op);
 // Chip8 is Big-endian
 // Big-endian reads from msb -> lsb
 // Examples: 3xkk, 5xy0
-// These extract the bits, not the values at the register
+// These extract the bits from our opcodes, which determine our v register indicies, and the operation arguments.
 // x = 4-bit index of the V register (V0-VF)
 size_t Op::x(uint16_t opcode){
 	return (opcode & 0x0F00) >> 8; 
@@ -82,8 +82,6 @@ const char* Op::optostr(uint8_t op){
 	return "UWOTM8";
 }
 
-
-
 bool Chip8::LoadROM(const char* rom_path){
 	// Get length of file 
 	FILE* rom = fopen(rom_path, "rb");
@@ -110,9 +108,14 @@ bool Chip8::LoadROM(const char* rom_path){
 
 // Load font set into memory
 void Chip8::LoadFont(uint8_t* font){
-	for (int i = 0; i < 0x80; i++){
-		this->mem[i] = font[i];
-	}
+	memcpy(this->mem, font, (0x80 / sizeof(uint8_t)));
+}
+
+void ExitChip8(){
+	printf("Exiting... Goodbye!\n");
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	exit(1);
 }
 
 
