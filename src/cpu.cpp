@@ -2,13 +2,6 @@
 #include <chip8.h>
 #include <input.h>
 
-// For timer
-#ifdef __linux__
-#include <unistd.h>
-#endif
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 // Chip-8 instructions are 2 bytes (16-bits) long 
 void CPU::cycle(){
@@ -60,7 +53,6 @@ uint8_t CPU::decode(uint16_t opcode){
 			break;
 		case 0x7000: // 7xkk Vx, byte
 			op = Op::ADD; 
-
 			break;
 		case 0x8000:
 			switch(opcode & 0x000F){

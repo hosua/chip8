@@ -13,7 +13,6 @@ SDL_Rect Display::GetPixel(uint8_t x, uint8_t y){
 	return pixel;
 }
 
-
 void Display::RenderGFX(size_t* num_pixels, SDL_Renderer *renderer){
 	uint16_t x_pos = 1;
 	uint16_t y_pos = 1;

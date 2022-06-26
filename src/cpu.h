@@ -22,14 +22,15 @@ class CPU {
 		CPU(Chip8* chip8) : chip8(chip8), mem(chip8->mem) {}
 		CPU(Chip8* chip8, Clock* clock) : chip8(chip8), clock(clock), mem(chip8->mem) {}
 
-
 		// Fetches 2-byte (16-bit) instructions
 		void cycle();
 		// Counts down dt when it is non-zero
 		void delay_timer();
+
+		// Decode an opcode for so the CPU can understand it
 		uint8_t decode(uint16_t opcode);
 
-		// Execute CPU instructions
+		// Execute CPU instruction
 		void execute(uint8_t op);
 			
 		/* debugging functions */

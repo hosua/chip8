@@ -6,6 +6,7 @@
 uint64_t G_ticks_elapsed = 0;
 // TICK is the constant time representing the length of each tick in microseconds. 
 
+// I don't even really know why I implemented my own clock, I just kinda felt like it.
 void Clock::tick(){
 	if (steady_clock::now() - tick_start > std::chrono::microseconds(TICK)){
 		G_ticks_elapsed++;		

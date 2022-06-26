@@ -53,7 +53,7 @@ namespace Op {
 	size_t x(uint16_t opcode);
 	// y = 4-bit index of the V register (V0-VF)
 	size_t y(uint16_t opcode);
-	// kk = 8-bit constant
+	// kk = 8-bit constant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
 	uint8_t kk(uint16_t opcode);
 	// nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
 	uint16_t nnn(size_t opcode);
@@ -68,7 +68,7 @@ class Chip8 {
 		uint8_t gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
 		bool keys[NUM_KEYS] = {0}; // array of all keys from 0-F, 1 if pressed, 0 if unpressed
 		bool draw_flag = false; // draw flag
-								//
+
 		// Load ROM into memory
 		bool LoadROM(const char* rom_path);
 
