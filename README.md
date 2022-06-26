@@ -26,7 +26,7 @@ If you run this script without arguments, it will let you select a game from the
 If you cannot use the ``run.sh`` script for whatever reason, you can compile the program with ``make``,
 and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for example.
 
-Currently, the IBM test ROM works, some games partially work, but obviously aren't playable until I figure out keyboard input.
+Some games partially work right now.
 
 Some opcodes are still broken/not implemented yet.
 
