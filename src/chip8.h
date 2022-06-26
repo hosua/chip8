@@ -24,7 +24,7 @@
 #define VERBOSE_DISPLAY false
 #define VERBOSE_INPUT true
 
-// 1/60 = 0.16666666 * 10^6 =~ 16667
+// 1/60 = 0.16666666 * 10^3 = 16667
 #define TICK 16667
 
 class Chip8;
@@ -53,7 +53,7 @@ namespace Op {
 	size_t x(uint16_t opcode);
 	// y = 4-bit index of the V register (V0-VF)
 	size_t y(uint16_t opcode);
-	// kk = 8-bit constant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
+	// kk = 8-bit constant
 	uint8_t kk(uint16_t opcode);
 	// nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
 	uint16_t nnn(size_t opcode);

@@ -40,13 +40,12 @@ int main(int argc, char *argv[]){
 	printf("===============START================\n");
 	Clock clock;
 	chip8.LoadROM(rom_path);
-	CPU cpu(&chip8, &clock); 
+	CPU cpu(&chip8, &clock);
 	Display disp(&chip8);
 	
 	bool quit = false;
 	size_t num_pixels = 0;	
-	// size_t num_cycles = 50;
-	// for (int i = 0; i < num_cycles; i++){
+
 	size_t cycles = 0;
 	while(!quit){
 		InputHandler::GetChip8Keys(&chip8);

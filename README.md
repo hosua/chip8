@@ -1,9 +1,12 @@
+**This is still a work in progress**
+
 # Issues
-Some games partially work right now.
+Timing is broken
+
+Some games partially work right now, but most don't.
 
 Some opcodes are still broken/not implemented yet.
 
-**This is still a work in progress**
 
 # How to use
 
