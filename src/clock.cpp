@@ -24,11 +24,9 @@ void Clock::tick(){
 
 // Stop calling thread and wait for a specified number of ticks
 void Clock::wait(uint16_t num_ticks){
-	high_resolution_clock::time_point wait_start = std::chrono::system_clock::now();
-	high_resolution_clock::time_point wait_end = wait_start + std::chrono::microseconds(TICK * num_ticks);
 	if (VERBOSE_CLOCK) printf("Clock waiting for %i ticks\n", num_ticks);
-	// TODO: This is not right
-	// while (wait_start < wait_end);
+	std::this_thread::sleep_for(std::chrono::microseconds(TICK * num_ticks));
+
 }
 
 

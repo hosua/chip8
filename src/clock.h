@@ -4,6 +4,7 @@
 #include <chip8.h>
 
 #include <chrono>
+#include <thread>
 #include <functional>
 using std::chrono::high_resolution_clock;
 
