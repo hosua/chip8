@@ -6,10 +6,10 @@
 // Chip-8 instructions are 2 bytes (16-bits) long 
 void CPU::cycle(){
 	// Fetch the next opcode (read 16 bits)
-	this->opcode = mem[this->pc] << 8 | mem[this->pc + 1];
+	this->opcode = mem[pc] << 8 | mem[pc + 1];
 	uint8_t op = decode(this->opcode);
 	execute(op);
-	this->pc += 2; // increment program counter
+	pc += 2; // increment program counter
 }
 
 // Counts down dt when it is non-zero (60Hz, i.e. 1/60 seconds per tick)
@@ -29,7 +29,7 @@ uint8_t CPU::decode(uint16_t opcode){
 				case 0x00E0: // 00E0 no args
 					op = Op::CLS; 
 					break;
-				case 0x00EE: // 0xee no args
+				case 0x00EE: // 0xEE no args
 					op = Op::RET; 
 					break;
 				default: // 0nnn addr
@@ -150,8 +150,7 @@ void CPU::execute(uint8_t op){
 	uint8_t kk = Op::kk(opcode); // kk or byte - An 8-bit value, the lowest 8 bits of the instruction
 	uint16_t nnn = Op::nnn(opcode); // nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
 	uint8_t n = Op::n(opcode); // n or nibble - A 4-bit value, the lowest 4 bits of the instruction
-	if (VERBOSE_CPU) printf("0x%04x: 0x%04x ", this->pc, opcode);
-	if (VERBOSE_CPU) printf("%s ", opstr);
+	if (VERBOSE_CPU) printf("0x%04x: 0x%04x %s\n", pc, opcode, opstr);
 	switch(op){
 		default:
 			if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
@@ -159,16 +158,13 @@ void CPU::execute(uint8_t op){
 		case Op::ADD: // Add kk to Vx
 			switch(opcode & 0xF000){
 				case 0x7000: // ADD Vx, byte
-					this->v[x] += kk;
-					if (VERBOSE_CPU) printf("ADD 0x%02x -> V%zu\n", kk, x);
+					v[x] += kk;
 					break;
 				case 0x8000: // 8xy4 ADD Vx, Vy
-					this->v[y] += this->v[x]; 
-					if (VERBOSE_CPU) printf("V%i V%i\n", this->v[x], this->v[y]);
+					v[y] += v[x]; 
 					break;
 				case 0x001E: // Fx1E ADD I = I + Vx
-					this->i += this->v[x];
-					if (VERBOSE_CPU) printf("I, V%zu\n", x);
+					this->i += v[x];
 					break;
 			}
 			break;
@@ -176,16 +172,14 @@ void CPU::execute(uint8_t op){
 			/* Set Vx = Vx AND Vy.
 			 * Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx. 
 			 */
-			printf("V%zu & V%zu\n", x, y);
 			v[x] &= v[y];
 			break;
 		case Op::CALL: // Call subroutine
-			this->stack.push(this->pc);
-			this->pc = nnn; // Store address into program counter
-			this->pc -= 2;
+			stack.push(pc);
+			pc = nnn; // Store address into program counter
+			pc -= 2;
 			break;
-		case Op::CLS: // Clear screen
-			if (VERBOSE_CPU) printf("%s\n", opstr);
+		case Op::CLS: // 0x00E0 - Clear screen
 			// Clear 64x32 display
 			for(int i = 0; i < DISP_X*DISP_Y; i++)
 				chip8->gfx[i] = 0;
@@ -197,20 +191,17 @@ void CPU::execute(uint8_t op){
 					if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
 					break;
 				case 0x1000: // 1nnn - jump to address nnn
-					this->pc = nnn;
-					if (VERBOSE_CPU) printf("0x%03x\n", nnn);
-					this->pc -= 2;
+					pc = nnn;
+					pc -= 2;
 					break;
 				case 0xB000: // Bnnn - jump to address nnn + v[0]
-					this->pc = nnn + v[0];
-					if (VERBOSE_CPU) printf("0x%03x + 0x%03x\n", v[0], nnn);
-					this->pc -= 2;
+					pc = nnn + v[0];
+					pc -= 2;
 					break;
 			}
 			break;
-		case Op::DRW:
+		case Op::DRW: // Dxyn - Draw
 			{
-				if (VERBOSE_CPU) printf("Vx: 0x%01x Vy: 0x%01x n: %i i: 0x%02x\n", this->v[x], this->v[y], n, this->i);
 				/* Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. 
 				 * Each row of 8 pixels is read as bit-coded starting from memory location I; I value does not 
 				 * change after the execution of this instruction. As described above, VF is set to 1 if any 
@@ -219,23 +210,23 @@ void CPU::execute(uint8_t op){
 				// Dxyn
 				// Each sprite will always be 8 pixels wide
 				// The nibble, n is the height we will draw */
-				this->v[0xF] = 0;
+				v[0xF] = 0;
 				// Here, we need to get the actual values from the V registers 
 				// This is different from the x,y functions defined in Op::, as those extract the bits from the opcode itself.
 				n = opcode & 0x000F;
 				uint8_t px;
 				// dy is the y position of the line being drawn
 				for (int dy = 0; dy < n; dy++){
-					px = this->mem[this->i + dy];
+					px = mem[this->i + dy];
 					for(int dx = 0; dx < 8; dx++){
 						// dx is the x position of the pixel in the line being drawn
 						if(px & (0x80 >> dx)){
 							// and if gfx is set
-							if(chip8->gfx[(this->v[x] + dx + ((this->v[y] + dy) * DISP_X))]){
+							if(chip8->gfx[(v[x] + dx + ((v[y] + dy) * DISP_X))]){
 								// Set VF flag to 1 indicating that at least one pixel was unset
-								this->v[0xF] = 1;
+								v[0xF] = 1;
 							}
-							chip8->gfx[this->v[x] + dx + ((this->v[y] + dy) * DISP_X)] ^= 1;
+							chip8->gfx[v[x] + dx + ((v[y] + dy) * DISP_X)] ^= 1;
 						}
 					}
 				}
@@ -250,17 +241,14 @@ void CPU::execute(uint8_t op){
 						if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
 						break;
 					case 0x6000: // 6xkk - Set Vx to kk
-						this->v[x] = kk;
-						if (VERBOSE_CPU) printf("V%zu 0x%02x\n", x, kk);
-						this->pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
+						v[x] = kk;
+						pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
 						break;
 					case 0x8000: // 8xy0 - Set Vx to Vy
-						this->v[x] = this->v[y];
-						if (VERBOSE_CPU) printf("V%i V%i\n", this->v[x], this->v[y]);
+						v[x] = v[y];
 						break;
 					case 0xA000: // annn - Set i to address nnn
 						this->i = nnn;
-						if (VERBOSE_CPU) printf("0x%03x -> I\n", nnn);
 						break;
 					case 0xF000:
 						switch(opcode & 0x00FF){
@@ -268,50 +256,42 @@ void CPU::execute(uint8_t op){
 								if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
 								break;
 							case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
-								this->dt = this->v[x];
-								if (VERBOSE_CPU) printf("V%zu DT\n", x);
+								this->dt = v[x];
 								break;
 							case 0x000A: // Fx0A - LD Vx, K
 								{
-									if (VERBOSE_CPU) printf("V%zu, K\n", x);
-									this->v[x] = InputHandler::WaitForKeyPress();
+									v[x] = InputHandler::WaitForKeyPress();
 									break;
 								}
 							case 0x0015: // Fx15 - LD DT, Vx
-								this->v[x] = this->dt;
-								if (VERBOSE_CPU) printf("V%zu\n", x);
+								v[x] = this->dt;
 								break;
 							case 0x0018: // Fx18 - LD ST, Vx
-								this->v[x] = this->st;
-								if (VERBOSE_CPU) printf("V%zu\n", x);
+								v[x] = this->st;
 								break;
 							case 0x0029: // Fx29 - LD F Vx -> I
 										 // The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
-								if (VERBOSE_CPU) printf("F V%zu -> I\n", x);
-								this->i = this->v[x] * 0x5; // Each font is 5 bytes wide (as shown in textfont) 
+								this->i = v[x] * 0x5; // Each font is 5 bytes wide (as shown in textfont) 
 								break;
 							case 0x0033: // Fx33 - LD B, Vx
 										 // Store BCD representation of Vx in mem locations I, I+1, and I+2.
 										 // BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
-								if (VERBOSE_CPU) printf("LD B, V%zu\n", x);
-								this->mem[this->i] = this->v[x] / 100; // Load 100s place into memory
-								this->mem[this->i+1] = (this->v[x] / 10) % 10; // Load 10s place into memory
-								this->mem[this->i+2] = this->v[x] % 10; // Load 1s place into memory
+								mem[this->i] = v[x] / 100; // Load 100s place into memory
+								mem[this->i+1] = (v[x] / 10) % 10; // Load 10s place into memory
+								mem[this->i+2] = v[x] % 10; // Load 1s place into memory
 								break;
 							case 0x0055: // Fx55 - LD [I], Vx
 								for (uint8_t i = 0; i <= x; i++){
 									// Stores from V0 to VX (including VX) into memory, starting at address I. The offset from I is increased by 1 for each value written, 
 									// but I itself is left unmodified.
-									if (VERBOSE_CPU) printf("I -> V%zu\n", x);
-									this->mem[this->i + i] = this->v[i];
+									mem[this->i + i] = v[i];
 								}
 								this->i += x + 1;
 								break;
 							case 0x0065: // Fx65 - LD Vx, [I]
 										 // Read from memory starting at address I into v registers
-								if (VERBOSE_CPU) printf("LD V0-V%zu -> I\n", x);
 								for (uint8_t i = 0; i <= x; i++){
-									this->v[i] = this->mem[this->i + i];
+									v[i] = mem[this->i + i];
 								}
 
 								this->i += x + 1;
@@ -321,31 +301,30 @@ void CPU::execute(uint8_t op){
 			}
 		case Op::SE:
 			// The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
-			if (this->v[x] == kk){ 
-				this->pc += 2;
-				if (VERBOSE_CPU) printf("SKIPPING\n");
-				if (VERBOSE_CPU) printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
+			if (v[x] == kk){ 
+				pc += 2;
 			} else {
-				if (VERBOSE_CPU) printf("NOT SKIPPING\n");
-				if (VERBOSE_CPU) printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
 			}
 			break;
 		case Op::SNE:
 			{
 				// Skip next instruction if Vx != kk
-				if (this->v[x] != kk){
-					this->pc += 2;
-					if (VERBOSE_CPU) printf("SKIPPING\n");
-					if (VERBOSE_CPU) printf("V%zu: 0x%02x != 0x%02x\n", x, this->v[x], kk);
+				if (v[x] != kk){
+					pc += 2;
 				} else {
-					if (VERBOSE_CPU) printf("NOT SKIPPING\n");
-					if (VERBOSE_CPU) printf("V%zu: 0x%02x == 0x%02x\n", x, this->v[x], kk);
 				}
 				break;
 			}
+		case Op::SHL: // 8xyE - SHL Vx {, Vy}
+			{
+				// The 0-based index of the msb in an 8-bit number is 7.
+				v[0xF] = v[x] >> MSB_POS;
+				// Shift vy left once and store it in vx
+				v[x] = v[y] << 1;
+			}
 		case Op::SHR: // 8xy6 - SHR Vx {, Vy}
 			{
-				// TODO: Wrong according to opcode test
+				// TODO: Wrong according to opcode test???
 				// Set Vx = Vx SHR 1.
 				// Store LSB in vf
 				v[0xF] = v[x] & 1;
@@ -356,40 +335,31 @@ void CPU::execute(uint8_t op){
 		case Op::SKP: // Ex9E - SKP Vx "Skip if pressed"
 			{
 				// Skip next instruction if key with value of Vx is pressed
-				if (chip8->keys[this->v[x]]){ // If key is pressed
-					this->pc += 2;
-					if (VERBOSE_CPU) printf("SKIPPING, Vx == K\n");
+				if (chip8->keys[v[x]]){ // If key is pressed
+					pc += 2;
 					if (VERBOSE_INPUT) InputHandler::PrintChip8Keys(chip8);
 				} else {
-					if (VERBOSE_CPU) printf("NOT SKIPPING, Vx != K\n");
 				}
-				// if (VERBOSE_CPU) printf("Warning: op is not implemented yet!\n");
 				break;
 			}
 		case Op::SKNP: // ExA1 - SKNP Vx "Skip if not pressed"
 			{
-				if (!chip8->keys[this->v[x]]){ // If key is not pressed
-					if (VERBOSE_CPU) printf("SKIPPING, Vx == K\n");
-					this->pc += 2;
+				if (!chip8->keys[v[x]]){ // If key is not pressed
+					pc += 2;
 				} else {
-					if (VERBOSE_CPU) printf("NOT SKIPPING, Vx != K\n");
 				}
-				// if (VERBOSE_CPU) printf("Warning: op is not implemented yet!\n");
 				break;
 			}
 		case Op::SUB: // 8xy5 - SUB Vx, Vy
 			// If Vx > Vy, then VF is set to 1, otherwise 0. 
 			if (v[x] > v[y]){
-				if (VERBOSE_CPU) printf("Borrow occurred\n");
 				v[0xF] = 1; 	
 			} else {
-				if (VERBOSE_CPU) printf("No borrow occurred\n");
 				v[0xF] = 0;
 			}
 			// Set Vx = Vx - Vy, set VF = NOT borrow.
 			// Then Vy is subtracted from Vx, and the results stored in Vx.
 			v[x] -= v[y];
-			if (VERBOSE_CPU) printf("V%zu -= V%zu\n", x, y);
 			break;
 		case Op::SUBN: // 8xy7 - SUBN Vx, Vy
 			// Set Vx = Vy - Vx, set VF = NOT borrow.
@@ -401,24 +371,20 @@ void CPU::execute(uint8_t op){
 			}
 			// Then Vx is subtracted from Vy, and the results stored in Vx.
 			v[x] = v[y] - v[x];
-			if (VERBOSE_CPU) printf("Warning: op is not implemented yet!\n");
+			// if (VERBOSE_CPU) printf("Warning: op is not implemented yet!\n");
 			break;
 		case Op::RET: // 00EE - RET "Return"
-			if (VERBOSE_CPU) printf("top: 0x%04x\n", stack.top());
-			this->pc = this->stack.top();
-			this->stack.pop();
+			pc = stack.top();
+			stack.pop();
 			break;
 		case Op::RND: // RND Vx "Random"
-			this->v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255
-			if (VERBOSE_CPU) printf("RND V%zu = 0x%02x\n", x, v[x]);
+			v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255
 			break;
 		case Op::SYS: // Ignored
-			if (VERBOSE_CPU) printf("\n");
 			break;
 		case Op::XOR: // Exclusive OR
 					  // Performs a bitwise XOR on the values of Vx and Vy, then stores the result in Vx.
-			if (VERBOSE_CPU) printf("V%zu = Vx ^ Vy = 0x%02x\n", x, this->v[x] ^ this->v[y]);
-			this->v[x] ^= this->v[y];
+			v[x] ^= v[y];
 			break;
 		case Op::ERR:
 			if (VERBOSE_CPU) printf("You fucked up kid\n");
@@ -430,11 +396,11 @@ void CPU::print_registers(){
 	printf("------------\n");
 	printf("v registers:\n");
 	for (int i = 0; i < NUM_VREGS; i++)
-		printf("%i: %02x ", i, this->v[i]);
+		printf("%i: %02x ", i, v[i]);
 	printf("\n");
 	// printf("sp: 0x%04x\n", this->sp);
 	printf("i: 0x%04x\n", this->i);
-	printf("pc: 0x%04x\n", this->pc);
+	printf("pc: 0x%04x\n", pc);
 	printf("dt: 0x%02x\n", this->dt);
 	printf("st: 0x%02x\n", this->st);
 	printf("------------\n");

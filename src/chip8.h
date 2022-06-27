@@ -17,6 +17,7 @@
 #define DISP_X 64
 #define DISP_Y 32
 #define SPRITE_WIDTH 8
+#define MSB_POS 7 // MSB index of an 8-bit number
 
 #define DEBUG_MODE false // Frame by frame execution
 #define VERBOSE_CLOCK false
