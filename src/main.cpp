@@ -7,7 +7,6 @@
 // For arg parser
 #include <unistd.h>
 
-
 SDL_Window* window = SDL_CreateWindow("CHIP8", 
 									SDL_WINDOWPOS_CENTERED, 
 									SDL_WINDOWPOS_CENTERED, 

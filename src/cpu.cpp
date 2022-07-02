@@ -150,6 +150,7 @@ uint8_t CPU::decode(uint16_t opcode){
 
 // Execute CPU instructions
 void CPU::execute(uint8_t op){
+	const char* description = "";
 	const char* opstr = Op::optostr(op);
 	size_t x = Op::x(opcode); // x - A 4-bit value, the lower 4 bits of the high byte of the instruction
 	size_t y = Op::y(opcode); // y - A 4-bit value, the upper 4 bits of the low byte of the instruction
@@ -161,28 +162,34 @@ void CPU::execute(uint8_t op){
 			if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
 			break;
 		case Op::ADD: // Add kk to Vx
-			switch(opcode & 0xF000){
-				case 0x7000: // ADD Vx, byte
-					v[x] += kk;
-					break;
-				case 0x8000: // 8xy4 ADD Vx, Vy
-					{
-						v[x] += v[y];
-						if (v[y] > v[x]){ 
-							// Carry flag
-							v[0xF] = 1; 	
-						} else {
-							v[0xF] = 0;
-						}
+			{
+				switch(opcode & 0xF000){
+					case 0x7000: // ADD Vx, byte
+						description = "Vx, kk";
+						v[x] += kk;
 						break;
-					}
-				case 0xF000: // Fx1E ADD I = I + Vx
-					this->i += v[x];
-					break;
+					case 0x8000: // 8xy4 ADD Vx, Vy
+						{
+							description = "Vx, Vy";
+							v[x] += v[y];
+							if (v[y] > v[x]){ 
+								// Carry flag
+								v[0xF] = 1; 	
+							} else {
+								v[0xF] = 0;
+							}
+							break;
+						}
+					case 0xF000: // Fx1E ADD I = I + Vx
+						description = "I, Vx";
+						this->i += v[x];
+						break;
+				}
+				break;
 			}
-			break;
 		case Op::AND: // 8xy2 - AND Vx, Vy
-			// Set Vx = Vx AND Vy.
+					  // Set Vx = Vx AND Vy.
+			description = "Vx, Vy";
 			v[x] &= v[y];
 			break;
 		case Op::CALL: // 2nnn - Call subroutine
@@ -191,28 +198,33 @@ void CPU::execute(uint8_t op){
 			pc -= 2;
 			break;
 		case Op::CLS: // 0x00E0 - Clear screen
-			// Clear 64x32 display
+					  // Clear 64x32 display
 			for(int i = 0; i < DISP_X*DISP_Y; i++)
 				chip8->gfx[i] = 0;
 			chip8->draw_flag = true;
 			break;
 		case Op::JP: // Jump
-			switch(opcode & 0xF000){
-				default:
-					if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
-					break;
-				case 0x1000: // 1nnn - jump to address nnn
-					pc = nnn;
-					pc -= 2;
-					break;
-				case 0xB000: // Bnnn - jump to address nnn + v[0]
-					pc = nnn + v[0];
-					pc -= 2;
-					break;
+			{
+				switch(opcode & 0xF000){
+					default:
+						if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
+						break;
+					case 0x1000: // 1nnn - jump to address nnn
+						description = "addr";
+						pc = nnn;
+						pc -= 2;
+						break;
+					case 0xB000: // Bnnn - jump to address nnn + v[0]
+						description = "V0, addr";
+						pc = nnn + v[0];
+						pc -= 2;
+						break;
+				}
+				break;
 			}
-			break;
 		case Op::DRW: // Dxyn - Draw
 			{
+				description = "Vx, Vy, nibble";
 				/* Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. 
 				 * Each row of 8 pixels is read as bit-coded starting from memory location I; I value does not 
 				 * change after the execution of this instruction. As described above, VF is set to 1 if any 
@@ -252,13 +264,16 @@ void CPU::execute(uint8_t op){
 						if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
 						break;
 					case 0x6000: // 6xkk - Set Vx to kk
+						description = "Vx, kk";
 						v[x] = kk;
 						// pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
 						break;
 					case 0x8000: // 8xy0 - Set Vx to Vy
+						description = "Vx, Vy";
 						v[x] = v[y];
 						break;
 					case 0xA000: // Annn - Set i to address nnn
+						description = "I, addr";
 						this->i = nnn;
 						break;
 					case 0xF000:
@@ -266,30 +281,37 @@ void CPU::execute(uint8_t op){
 							default:
 								if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
 								break;
-							case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
-								this->dt = v[x];
+							case 0x0007: // Fx07 - LD Vx, DT "load DT into Vx"
+								description = "Vx, DT";
+								v[x] = dt;
 								break;
 							case 0x000A: // Fx0A - LD Vx, K
+								description = "Vx, K";
 								v[x] = InputHandler::WaitForKeyPress();
 								break;
 							case 0x0015: // Fx15 - LD DT, Vx
-								v[x] = this->dt;
+								description = "DT, Vx";
+								dt = v[x];
 								break;
 							case 0x0018: // Fx18 - LD ST, Vx
-								v[x] = this->st;
+								description = "ST, Vx";
+								st = v[x];
 								break;
-							case 0x0029: // Fx29 - LD F Vx -> I
+							case 0x0029: // Fx29 - LD F, Vx
+								description = "F, Vx";
 								// The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
 								this->i = v[x] * 0x5; // Each font is 5 bytes wide (as shown in textfont) 
 								break;
 							case 0x0033: // Fx33 - LD B, Vx
-										 // Store BCD representation of Vx in mem locations i, i+1, and I+2.
-										 // BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
+								description = "B, Vx";
+								// Store BCD representation of Vx in mem locations i, i+1, and I+2.
+								// BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
 								mem[this->i] = v[x] / 100; // Load 100s place into memory
 								mem[this->i+1] = (v[x] / 10) % 10; // Load 10s place into memory
 								mem[this->i+2] = v[x] % 10; // Load 1s place into memory
 								break;
 							case 0x0055: // Fx55 - LD [I], Vx
+								description = "[I], Vx";
 								// TODO: WRONG??
 								for (uint8_t i = 0; i <= x; i++){
 									// Stores from V0 to VX (including VX) into memory, starting at address I. The offset from I is increased by 1 for each value written, 
@@ -299,7 +321,8 @@ void CPU::execute(uint8_t op){
 								this->i += x + 1;
 								break;
 							case 0x0065: // Fx65 - LD Vx, [I]
-										 // Read from memory starting at address I into v registers
+								description = "Vx [I]";
+								// Read from memory starting at address I into v registers
 								for (uint8_t i = 0; i <= x; i++){
 									v[i] = mem[this->i + i];
 								}
@@ -308,128 +331,124 @@ void CPU::execute(uint8_t op){
 								break;	
 						}
 				}
+				break;
 			}
 		case Op::OR: // 8xy1 - OR Vx, Vy
+			description = "Vx, Vy";
 			// Set Vx = Vx OR Vy.
 			v[x] |= v[y];
 			break;
 		case Op::SE: // 5xy0 - SE Vx, Vy
-			{
-				switch(opcode & 0xF000){
-					default:
-						if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
-						break;
+			switch(opcode & 0xF000){
+				default:
+					if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
+					break;
 					// 3xkk - SE Vx, byte
-					case 0x3000:
-						// The interpreter compares register Vx to kk, and if they are equal, 
-						// increments the program counter by 2.
-						if (v[x] == kk)
-							pc += 2;
-						break;
+				case 0x3000:
+					description = "Vx, kk";
+					// The interpreter compares register Vx to kk, and if they are equal, 
+					// increments the program counter by 2.
+					if (v[x] == kk)
+						pc += 2;
+					break;
 					// 5xy0 - SE Vx, Vy
-					case 0x5000:
-						// Skip next instruction if Vx = Vy.
-						if (v[x] == v[y])
-							pc += 2;
-						break;
-				}
-				break;
+				case 0x5000:
+					description = "Vx, Vy";
+					// Skip next instruction if Vx = Vy.
+					if (v[x] == v[y])
+						pc += 2;
+					break;
 			}
+			break;
 		case Op::SNE:
-			{
-				switch (opcode & 0xF000){
-					// 4xkk - SNE Vx, byte
-					case 0x4000:
-						// Skip next instruction if Vx != kk
-						if (v[x] != kk)
-							pc += 2;
-						break;
+			switch (opcode & 0xF000){
+				// 4xkk - SNE Vx, byte
+				case 0x4000:
+					description = "Vx, kk";
+					// Skip next instruction if Vx != kk
+					if (v[x] != kk)
+						pc += 2;
+					break;
 					// 9xy0 - SNE Vx, Vy
-					case 0x9000: 
-						// 9xy0 - SNE Vx, Vy
-						// Skip next instruction if Vx != Vy.
-						if (v[x] != v[y])
-							pc += 2;
-						break;
-				}
-				break;
+				case 0x9000: 
+					description = "Vx, Vy";
+					// 9xy0 - SNE Vx, Vy
+					// Skip next instruction if Vx != Vy.
+					if (v[x] != v[y])
+						pc += 2;
+					break;
 			}
+			break;
 		case Op::SHL: // 8xyE - SHL Vx {, Vy}
-			{
-				// The 0-based index of the msb in an 8-bit number is 7.
-				v[0xF] = v[x] >> MSB_POS;
-				// Shift vy left once and store it in vx
-				v[x] <<= 1;
-				break;
-			}
+			description = "Vx {, Vy}";
+			// The 0-based index of the msb in an 8-bit number is 7.
+			v[0xF] = v[x] >> MSB_POS;
+			// Shift vy left once and store it in vx
+			v[x] <<= 1;
+			break;
 		case Op::SHR: // 8xy6 - SHR Vx {, Vy}
-			{
-				// Set Vx = Vx SHR 1.
-				// Store LSB in vf
-				v[0xF] = v[x] & 1;
-				// Shift right once and store it in vx
-				v[x] >>= 1;
-				break;
-			}
+			description = "Vx {, Vy}";
+			// Set Vx = Vx SHR 1.
+			// Store LSB in vf
+			v[0xF] = v[x] & 1;
+			// Shift right once and store it in vx
+			v[x] >>= 1;
+			break;
 		case Op::SKP: // Ex9E - SKP Vx "Skip if pressed"
-			{
-				// Skip next instruction if key with value of Vx is pressed
-				if (chip8->keys[v[x]]){ // If key is pressed
-					pc += 2;
-					if (VERBOSE_INPUT) InputHandler::PrintChip8Keys(chip8);
-				} else {
-				}
-				break;
-			}
+			description = "Vx";
+			// Skip next instruction if key with value of Vx is pressed
+			if (chip8->keys[v[x]]){ // If key is pressed
+				pc += 2;
+				if (VERBOSE_INPUT) InputHandler::PrintChip8Keys(chip8);
+			} 
+			break;
 		case Op::SKNP: // ExA1 - SKNP Vx "Skip if not pressed"
-			{
-				if (!chip8->keys[v[x]]){ // If key is not pressed
-					pc += 2;
-				} else {
-				}
-				break;
-			}
+			description = "Vx";
+			if (!chip8->keys[v[x]]) // If key is not pressed
+				pc += 2;
+			break;
 		case Op::SUB: // 8xy5 - SUB Vx, Vy
+			description = "Vx, Vy";
 			// If Vx > Vy, then VF is set to 1, otherwise 0. 
-			if (v[x] > v[y]){
+			if (v[x] > v[y])
 				v[0xF] = 1; 	
-			} else {
+			else
 				v[0xF] = 0;
-			}
 			// Set Vx = Vx - Vy, set VF = NOT borrow.
 			// Then Vy is subtracted from Vx, and the results stored in Vx.
 			v[x] -= v[y];
 			break;
 		case Op::SUBN: // 8xy7 - SUBN Vx, Vy
+			description = "Vx, Vy";
 			// Set Vx = Vy - Vx, set VF = NOT borrow.
 			// If Vy > Vx, then VF is set to 1, otherwise 0. 
-			if (v[y] > v[x]){
+			if (v[y] > v[x])
 				v[0xF] = 1;
-			} else {
+			else
 				v[0xF] = 0;
-			}
 			// Then Vx is subtracted from Vy, and the results stored in Vx.
 			v[x] = v[y] - v[x];
-			// if (VERBOSE_CPU) printf("Warning: op is not implemented yet!\n");
 			break;
 		case Op::RET: // 00EE - RET "Return"
 			pc = stack.top();
 			stack.pop();
 			break;
-		case Op::RND: // RND Vx "Random"
+		case Op::RND: // RND Vx, byte
+			description = "Vx, kk";
 			v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255
 			break;
 		case Op::SYS: // Ignored
 			break;
 		case Op::XOR: // 8xy3 - XOR Vx, Vy
-					  // Performs a bitwise XOR on the values of Vx and Vy, then stores the result in Vx.
+			description = "Vx, Vy";
+			// Performs a bitwise XOR on the values of Vx and Vy, then stores the result in Vx.
 			v[x] ^= v[y];
 			break;
 		case Op::ERR:
 			if (VERBOSE_CPU) printf("You fucked up kid\n");
 			break;
 	}
-	if (VERBOSE_CPU) printf("0x%04X: 0x%04X %s\n", pc, opcode, opstr);
+	if (VERBOSE_CPU) printf("0x%04X: 0x%04X %s %s\n", pc, opcode, opstr, description);
 	print_args(opcode);
 	print_registers();
 }
@@ -459,8 +478,8 @@ void CPU::print_args(uint16_t opcode){
 	uint8_t kk = Op::kk(opcode);
 	uint16_t nnn = Op::nnn(opcode);
 	uint8_t n = Op::n(opcode);
-	printf("x: %zu\n", x);
-	printf("y: %zu\n", y);
+	printf("x: 0x%02zX\n", x);
+	printf("y: 0x%02zX\n", y);
 	printf("kk: 0x%02X\n", kk);
 	printf("nnn: 0x%03X\n", nnn);
 	printf("n: 0x%01X\n", n);
