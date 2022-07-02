@@ -18,7 +18,10 @@ void CPU::delay_timer(){
 		clock->wait(this->dt); // Wait for ticks to process
 		this->dt = 0x0; // set dt to 0
 	}
-	std::this_thread::sleep_for(std::chrono::microseconds(250));
+	if (!SLOW_MODE)
+		std::this_thread::sleep_for(std::chrono::microseconds(1000));
+	else 
+		std::this_thread::sleep_for(std::chrono::microseconds(TICK * 2));
 }
 
 uint8_t CPU::decode(uint16_t opcode){
@@ -48,6 +51,9 @@ uint8_t CPU::decode(uint16_t opcode){
 			break;
 		case 0x4000: // 4xkk Vx, byte
 			op = Op::SNE; 
+			break;
+		case 0x5000: // 5xy0 - SE Vx, Vy
+			op = Op::SE; 
 			break;
 		case 0x6000: // 6xkk Vx, byte
 			op = Op::LD; 
@@ -110,7 +116,7 @@ uint8_t CPU::decode(uint16_t opcode){
 					op = Op::SKNP;
 					break;
 				default:
-					if (VERBOSE_CPU) printf("Error: Invalid opcode: {%04x}\n", opcode);
+					if (VERBOSE_CPU) printf("Error: Invalid opcode: {%04X}\n", opcode);
 					break;
 			}
 			break;
@@ -130,13 +136,13 @@ uint8_t CPU::decode(uint16_t opcode){
 					op = Op::ADD;
 					break;
 				default:
-					if (VERBOSE_CPU) printf("Error: Invalid opcode: {%04x}\n", opcode);
+					if (VERBOSE_CPU) printf("Error: Invalid opcode: {%04X}\n", opcode);
 					break;
 
 			}
 			break;
 		default:
-			if (VERBOSE_CPU) printf("Error: Invalid opcode: {%04x}\n", opcode);
+			if (VERBOSE_CPU) printf("Error: Invalid opcode: {%04X}\n", opcode);
 			break;
 	}
 	return op;
@@ -150,10 +156,9 @@ void CPU::execute(uint8_t op){
 	uint8_t kk = Op::kk(opcode); // kk or byte - An 8-bit value, the lowest 8 bits of the instruction
 	uint16_t nnn = Op::nnn(opcode); // nnn or addr - A 12-bit value, the lowest 12 bits of the instruction
 	uint8_t n = Op::n(opcode); // n or nibble - A 4-bit value, the lowest 4 bits of the instruction
-	if (VERBOSE_CPU) printf("0x%04x: 0x%04x %s\n", pc, opcode, opstr);
 	switch(op){
 		default:
-			if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
+			if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
 			break;
 		case Op::ADD: // Add kk to Vx
 			switch(opcode & 0xF000){
@@ -161,20 +166,26 @@ void CPU::execute(uint8_t op){
 					v[x] += kk;
 					break;
 				case 0x8000: // 8xy4 ADD Vx, Vy
-					v[y] += v[x]; 
-					break;
-				case 0x001E: // Fx1E ADD I = I + Vx
+					{
+						v[x] += v[y];
+						if (v[y] > v[x]){ 
+							// Carry flag
+							v[0xF] = 1; 	
+						} else {
+							v[0xF] = 0;
+						}
+						break;
+					}
+				case 0xF000: // Fx1E ADD I = I + Vx
 					this->i += v[x];
 					break;
 			}
 			break;
 		case Op::AND: // 8xy2 - AND Vx, Vy
-			/* Set Vx = Vx AND Vy.
-			 * Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx. 
-			 */
+			// Set Vx = Vx AND Vy.
 			v[x] &= v[y];
 			break;
-		case Op::CALL: // Call subroutine
+		case Op::CALL: // 2nnn - Call subroutine
 			stack.push(pc);
 			pc = nnn; // Store address into program counter
 			pc -= 2;
@@ -188,7 +199,7 @@ void CPU::execute(uint8_t op){
 		case Op::JP: // Jump
 			switch(opcode & 0xF000){
 				default:
-					if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
+					if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
 					break;
 				case 0x1000: // 1nnn - jump to address nnn
 					pc = nnn;
@@ -238,31 +249,29 @@ void CPU::execute(uint8_t op){
 			{
 				switch(opcode & 0xF000){
 					default:
-						if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
+						if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
 						break;
 					case 0x6000: // 6xkk - Set Vx to kk
 						v[x] = kk;
-						pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
+						// pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
 						break;
 					case 0x8000: // 8xy0 - Set Vx to Vy
 						v[x] = v[y];
 						break;
-					case 0xA000: // annn - Set i to address nnn
+					case 0xA000: // Annn - Set i to address nnn
 						this->i = nnn;
 						break;
 					case 0xF000:
 						switch(opcode & 0x00FF){
 							default:
-								if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04x}\n", opcode);
+								if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
 								break;
 							case 0x0007: // Fx07 - LD Vx, DT "load Vx into DT"
 								this->dt = v[x];
 								break;
 							case 0x000A: // Fx0A - LD Vx, K
-								{
-									v[x] = InputHandler::WaitForKeyPress();
-									break;
-								}
+								v[x] = InputHandler::WaitForKeyPress();
+								break;
 							case 0x0015: // Fx15 - LD DT, Vx
 								v[x] = this->dt;
 								break;
@@ -270,17 +279,18 @@ void CPU::execute(uint8_t op){
 								v[x] = this->st;
 								break;
 							case 0x0029: // Fx29 - LD F Vx -> I
-										 // The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
+								// The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. 
 								this->i = v[x] * 0x5; // Each font is 5 bytes wide (as shown in textfont) 
 								break;
 							case 0x0033: // Fx33 - LD B, Vx
-										 // Store BCD representation of Vx in mem locations I, I+1, and I+2.
+										 // Store BCD representation of Vx in mem locations i, i+1, and I+2.
 										 // BCD = Binary coded representation, see https://www.techtarget.com/whatis/definition/binary-coded-decimal
 								mem[this->i] = v[x] / 100; // Load 100s place into memory
 								mem[this->i+1] = (v[x] / 10) % 10; // Load 10s place into memory
 								mem[this->i+2] = v[x] % 10; // Load 1s place into memory
 								break;
 							case 0x0055: // Fx55 - LD [I], Vx
+								// TODO: WRONG??
 								for (uint8_t i = 0; i <= x; i++){
 									// Stores from V0 to VX (including VX) into memory, starting at address I. The offset from I is increased by 1 for each value written, 
 									// but I itself is left unmodified.
@@ -299,19 +309,48 @@ void CPU::execute(uint8_t op){
 						}
 				}
 			}
-		case Op::SE:
-			// The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
-			if (v[x] == kk){ 
-				pc += 2;
-			} else {
-			}
+		case Op::OR: // 8xy1 - OR Vx, Vy
+			// Set Vx = Vx OR Vy.
+			v[x] |= v[y];
 			break;
+		case Op::SE: // 5xy0 - SE Vx, Vy
+			{
+				switch(opcode & 0xF000){
+					default:
+						if (VERBOSE_CPU) printf("\nError: Invalid opcode {%04X}\n", opcode);
+						break;
+					// 3xkk - SE Vx, byte
+					case 0x3000:
+						// The interpreter compares register Vx to kk, and if they are equal, 
+						// increments the program counter by 2.
+						if (v[x] == kk)
+							pc += 2;
+						break;
+					// 5xy0 - SE Vx, Vy
+					case 0x5000:
+						// Skip next instruction if Vx = Vy.
+						if (v[x] == v[y])
+							pc += 2;
+						break;
+				}
+				break;
+			}
 		case Op::SNE:
 			{
-				// Skip next instruction if Vx != kk
-				if (v[x] != kk){
-					pc += 2;
-				} else {
+				switch (opcode & 0xF000){
+					// 4xkk - SNE Vx, byte
+					case 0x4000:
+						// Skip next instruction if Vx != kk
+						if (v[x] != kk)
+							pc += 2;
+						break;
+					// 9xy0 - SNE Vx, Vy
+					case 0x9000: 
+						// 9xy0 - SNE Vx, Vy
+						// Skip next instruction if Vx != Vy.
+						if (v[x] != v[y])
+							pc += 2;
+						break;
 				}
 				break;
 			}
@@ -320,18 +359,18 @@ void CPU::execute(uint8_t op){
 				// The 0-based index of the msb in an 8-bit number is 7.
 				v[0xF] = v[x] >> MSB_POS;
 				// Shift vy left once and store it in vx
-				v[x] = v[y] << 1;
+				v[x] <<= 1;
+				break;
 			}
 		case Op::SHR: // 8xy6 - SHR Vx {, Vy}
 			{
-				// TODO: Wrong according to opcode test???
 				// Set Vx = Vx SHR 1.
 				// Store LSB in vf
 				v[0xF] = v[x] & 1;
-				// Shift vy right once and store it in vx
-				v[x] = v[y] >> 1;
+				// Shift right once and store it in vx
+				v[x] >>= 1;
 				break;
-}
+			}
 		case Op::SKP: // Ex9E - SKP Vx "Skip if pressed"
 			{
 				// Skip next instruction if key with value of Vx is pressed
@@ -382,7 +421,7 @@ void CPU::execute(uint8_t op){
 			break;
 		case Op::SYS: // Ignored
 			break;
-		case Op::XOR: // Exclusive OR
+		case Op::XOR: // 8xy3 - XOR Vx, Vy
 					  // Performs a bitwise XOR on the values of Vx and Vy, then stores the result in Vx.
 			v[x] ^= v[y];
 			break;
@@ -390,24 +429,30 @@ void CPU::execute(uint8_t op){
 			if (VERBOSE_CPU) printf("You fucked up kid\n");
 			break;
 	}
+	if (VERBOSE_CPU) printf("0x%04X: 0x%04X %s\n", pc, opcode, opstr);
+	print_args(opcode);
+	print_registers();
 }
 /* debugging functions */
 void CPU::print_registers(){
 	printf("------------\n");
 	printf("v registers:\n");
 	for (int i = 0; i < NUM_VREGS; i++)
-		printf("%i: %02x ", i, v[i]);
+		printf("%02X ", i);
 	printf("\n");
-	// printf("sp: 0x%04x\n", this->sp);
-	printf("i: 0x%04x\n", this->i);
-	printf("pc: 0x%04x\n", pc);
-	printf("dt: 0x%02x\n", this->dt);
-	printf("st: 0x%02x\n", this->st);
+	for (int i = 0; i < NUM_VREGS; i++)
+		printf("%02X ", v[i]);
+	printf("\n");
+	// printf("sp: 0x%04X\n", this->sp);
+	printf("i: 0x%04X\n", this->i);
+	printf("pc: 0x%04X\n", pc);
+	printf("dt: 0x%02X\n", this->dt);
+	printf("st: 0x%02X\n", this->st);
 	printf("------------\n");
 }
 
 void CPU::print_args(uint16_t opcode){
-	printf("opcode: 0x%04x\n", opcode);
+	printf("------------\n");
 	printf("op: %s\n", Op::optostr(decode(opcode)));
 	size_t x = Op::x(opcode);
 	size_t y = Op::y(opcode);
@@ -416,8 +461,8 @@ void CPU::print_args(uint16_t opcode){
 	uint8_t n = Op::n(opcode);
 	printf("x: %zu\n", x);
 	printf("y: %zu\n", y);
-	printf("kk: 0x%02x\n", kk);
-	printf("nnn: 0x%03x\n", nnn);
-	printf("n: 0x%01x\n", n);
+	printf("kk: 0x%02X\n", kk);
+	printf("nnn: 0x%03X\n", nnn);
+	printf("n: 0x%01X\n", n);
 }
 

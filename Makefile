@@ -30,7 +30,7 @@ OBJS := $(subst $(SOURCEDIR),$(BUILDDIR),$(SOURCES:.cpp=.o))
 DEPS = $(OBJS:.o=.d)
 
 # Compile flags
-CFLAGS = -Wall -lSDL2
+CFLAGS = -Wall -lSDL2 -g
 
 # Name the compiler
 CC = g++

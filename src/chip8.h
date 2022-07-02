@@ -19,14 +19,15 @@
 #define SPRITE_WIDTH 8
 #define MSB_POS 7 // MSB index of an 8-bit number
 
-#define DEBUG_MODE false // Frame by frame execution
-#define VERBOSE_CLOCK false
-#define VERBOSE_CPU true
-#define VERBOSE_DISPLAY false
-#define VERBOSE_INPUT true
-
 // 1/60 = 0.16666666 * 10^3 = 16667
 #define TICK 16667
+
+static bool SLOW_MODE = true;
+static bool DEBUG_MODE = false; // Frame by frame execution
+static bool VERBOSE_CLOCK = false;
+static bool VERBOSE_CPU = true;
+static bool VERBOSE_DISPLAY = false;
+static bool VERBOSE_INPUT = true;
 
 class Chip8;
 

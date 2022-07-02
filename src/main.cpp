@@ -4,10 +4,8 @@
 #include <input.h>
 #include <clock.h>
 
-#include <SDL2/SDL_scancode.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_timer.h>
+// For arg parser
+#include <unistd.h>
 
 
 SDL_Window* window = SDL_CreateWindow("CHIP8", 
@@ -19,12 +17,33 @@ SDL_Window* window = SDL_CreateWindow("CHIP8",
 								  );
 
 int main(int argc, char *argv[]){
+	// The cycle at which the emulator will start on (to make debugging less of a chore)
+	size_t start_cycle = 0;
+	int o;
+	std::string rom_str;
+	while ((o = getopt(argc, argv, ":d:")) != -1){
+		switch (o){
+			// Debug mode
+			case 'd':
+				if (optarg)
+					start_cycle = std::atoi(optarg);
+				printf("Running chip8 in debug mode...\n");
+				DEBUG_MODE = true;
+				break;
+			default:
+				printf("Error: When using debug mode, you must specify the frame to start on as an argument.\n");
+				exit(1);
+				break;
+		}
+	} 
+	// Parse non-option args
+	for (int i = optind; i < argc; i++)
+		rom_str += argv[i];	
+	
+
+
 	Chip8 chip8;
-	const char* rom_path = argv[1];
-	if (argc != 2){
-		printf("Error: Need to enter the path to the file as the argument\n");
-		return 0;
-	}
+	const char* rom_path = rom_str.c_str();
 	// SDL Rendering stuff
 	SDL_Renderer* renderer = NULL;
 
@@ -47,6 +66,17 @@ int main(int argc, char *argv[]){
 	size_t num_pixels = 0;	
 
 	size_t cycles = 0;
+	while(cycles < start_cycle-1){
+		InputHandler::GetChip8Keys(&chip8);
+		cpu.cycle();
+		disp.RenderGFX(&num_pixels, renderer);
+		printf("Cycles: %zu\n", cycles);
+		// Count down dt if it is non-zero
+		cpu.delay_timer();
+		clock.tick();
+		cycles++;
+	}
+
 	while(!quit){
 		InputHandler::GetChip8Keys(&chip8);
 		cycles++;

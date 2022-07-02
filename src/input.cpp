@@ -71,16 +71,18 @@ uint8_t InputHandler::WaitForKeyPress(){
 	SDL_Event event;
 	SDL_KeyboardEvent *key;
 	uint8_t scancode;
+	uint32_t event_type;
 	// Wait until a key event before continuing code execution
 	while(SDL_WaitEvent(&event)){
 		key = &event.key;
+		event_type = key->type;
 		scancode = key->keysym.scancode;
 
 		if (scancode == SDL_SCANCODE_ESCAPE)
 			if (!DEBUG_MODE) ExitChip8();
 
 		// Only break if we find a valid key mapped to the chip8
-		if (key_map.find(scancode) != key_map.end()) 
+		if (event_type == SDL_KEYUP && (key_map.find(scancode) != key_map.end())) 
 			break;
 	}
 	return scancode;
