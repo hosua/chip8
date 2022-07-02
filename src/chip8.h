@@ -22,12 +22,12 @@
 // 1/60 = 0.16666666 * 10^3 = 16667
 #define TICK 16667
 
-static bool SLOW_MODE = true;
-static bool DEBUG_MODE = false; // Frame by frame execution
-static bool VERBOSE_CLOCK = false;
-static bool VERBOSE_CPU = true;
-static bool VERBOSE_DISPLAY = false;
-static bool VERBOSE_INPUT = true;
+extern bool SLOW_MODE;
+extern bool DEBUG_MODE; // Frame by frame execution
+extern bool VERBOSE_CLOCK;
+extern bool VERBOSE_CPU;
+extern bool VERBOSE_DISPLAY;
+extern bool VERBOSE_INPUT;
 
 class Chip8;
 

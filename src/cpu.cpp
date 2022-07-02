@@ -266,7 +266,6 @@ void CPU::execute(uint8_t op){
 					case 0x6000: // 6xkk - Set Vx to kk
 						description = "Vx, kk";
 						v[x] = kk;
-						// pc -= 2; // TODO: I don't know how this is right, but I fucking want to know why
 						break;
 					case 0x8000: // 8xy0 - Set Vx to Vy
 						description = "Vx, Vy";
@@ -312,13 +311,12 @@ void CPU::execute(uint8_t op){
 								break;
 							case 0x0055: // Fx55 - LD [I], Vx
 								description = "[I], Vx";
-								// TODO: WRONG??
 								for (uint8_t i = 0; i <= x; i++){
 									// Stores from V0 to VX (including VX) into memory, starting at address I. The offset from I is increased by 1 for each value written, 
 									// but I itself is left unmodified.
 									mem[this->i + i] = v[i];
 								}
-								this->i += x + 1;
+								// this->i += x + 1;
 								break;
 							case 0x0065: // Fx65 - LD Vx, [I]
 								description = "Vx [I]";
@@ -327,7 +325,7 @@ void CPU::execute(uint8_t op){
 									v[i] = mem[this->i + i];
 								}
 
-								this->i += x + 1;
+								// this->i += x + 1;
 								break;	
 						}
 				}
@@ -399,7 +397,6 @@ void CPU::execute(uint8_t op){
 			// Skip next instruction if key with value of Vx is pressed
 			if (chip8->keys[v[x]]){ // If key is pressed
 				pc += 2;
-				if (VERBOSE_INPUT) InputHandler::PrintChip8Keys(chip8);
 			} 
 			break;
 		case Op::SKNP: // ExA1 - SKNP Vx "Skip if not pressed"
@@ -448,9 +445,11 @@ void CPU::execute(uint8_t op){
 			if (VERBOSE_CPU) printf("You fucked up kid\n");
 			break;
 	}
-	if (VERBOSE_CPU) printf("0x%04X: 0x%04X %s %s\n", pc, opcode, opstr, description);
-	print_args(opcode);
-	print_registers();
+	if (VERBOSE_CPU){
+		printf("0x%04X: 0x%04X %s %s\n", pc, opcode, opstr, description);
+		print_args(opcode);
+		print_registers();
+	}
 }
 /* debugging functions */
 void CPU::print_registers(){

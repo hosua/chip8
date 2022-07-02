@@ -13,6 +13,7 @@ void InputHandler::PrintChip8Keys(Chip8* chip8){
 	bool* keys = chip8->keys;
 	// 1 2 3 C
 	printf("KEYBOARD:\n");
+	
 	for (int i = 0x1; i <= 0x3; i++) 
 		printf("%i ", keys[i]);
 	printf("%i\n", keys[0xC]);
@@ -27,6 +28,7 @@ void InputHandler::PrintChip8Keys(Chip8* chip8){
 	// A 0 B F
 	printf("%i %i %i %i\n", keys[0xA], keys[0x0], keys[0xB], keys[0xF]);
 	printf("\n");
+	
 }
 
 /* Print all information about a key event */

@@ -5,6 +5,7 @@ EXEC="CHIP8"
 function usage(){
 echo "-c Compile Chip8 with make
 -d Delete all build files (including executable) with make clean
+-g Run in debug mode with gdb
 -e Exit
 -k Force kill CHIP8 
 -y Compile with compiledb script for YCM syntax completion/checking
