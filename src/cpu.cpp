@@ -239,10 +239,9 @@ void CPU::execute(uint8_t op){
 				n = opcode & 0x000F;
 				uint8_t px;
 				// Reduce if overflow
-				if (v[x] > 0x3F)
-					v[x] %= DISP_X;
-				if (v[y] > 0x1F)
-					v[y] %= DISP_Y;
+				if (v[x] > DISP_X) v[x] %= DISP_X;
+				if (v[y] > DISP_Y) v[y] %= DISP_Y;
+
 				// dy is the y position of the line being drawn
 				for (int dy = 0; dy < n; dy++){
 					px = mem[this->i + dy];
@@ -437,7 +436,7 @@ void CPU::execute(uint8_t op){
 			break;
 		case Op::RND: // RND Vx, byte
 			description = "Vx, kk";
-			v[x] = (rand() % 0xFF) & 0xFF; // Set Vx to random # from (0-255), then & 255
+			v[x] = (rand() % 0xFF) & kk; // Set Vx to random # from (0-255), then & kk
 			break;
 		case Op::SYS: // Ignored
 			break;

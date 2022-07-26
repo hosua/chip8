@@ -1,1 +1,3 @@
-gdb --args ./CHIP8 games/PONG --verbose cpu --debug-mode 10
+``./run.sh -kce ; ./CHIP8 games/TETRIS --debug-mode 280 --verbose cpu``
+
+``./run.sh -kce ; ./CHIP8 games/TETRIS --debug-mode 292 --verbose cpu``

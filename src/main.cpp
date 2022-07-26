@@ -40,18 +40,22 @@ int main(int argc, char *argv[]){
 
 	const struct option long_opts[] =
 	{
-		{"debug-mode", 	  required_argument,  0, 'd'},
+		{"debug-mode", 	  optional_argument,  0, 'd'},
 		{"verbose",   required_argument,  0, 'v'},
 		{"slow-mode",   no_argument,  0, 's'},
 		{"help",   no_argument,  0, 'h'},
 		{0,0,0,0},
 	};
-	while ((o = getopt_long(argc, argv, "hsv:d:", long_opts, &opt_index)) != -1){
+	while ((o = getopt_long(argc, argv, "hsv:d::", long_opts, &opt_index)) != -1){
 		switch (o){
 			// Debug mode
 			case 'd':
-				if (optarg)
-					start_frame = std::atoi(optarg);
+				// Get optarg if exists
+				if (optarg == NULL && optind < argc
+						&& argv[optind][0] != '-')
+					optarg = argv[optind++];
+				
+				if (optarg) start_frame = std::atoi(optarg);
 				printf("Running chip8 in debug mode...\n");
 				DEBUG_MODE = true;
 				break;
