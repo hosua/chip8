@@ -1,10 +1,11 @@
 [
  {
-  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/C++/chip8",
   "arguments": [
    "g++",
    "-Wall",
    "-lSDL2",
+   "-g",
    "-c",
    "-Isrc",
    "-o",
@@ -15,11 +16,28 @@
   "file": "src/chip8.cpp"
  },
  {
-  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/C++/chip8",
   "arguments": [
    "g++",
    "-Wall",
    "-lSDL2",
+   "-g",
+   "-c",
+   "-Isrc",
+   "-o",
+   "build/clock.o",
+   "src/clock.cpp",
+   "-MMD"
+  ],
+  "file": "src/clock.cpp"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C++/chip8",
+  "arguments": [
+   "g++",
+   "-Wall",
+   "-lSDL2",
+   "-g",
    "-c",
    "-Isrc",
    "-o",
@@ -30,11 +48,12 @@
   "file": "src/cpu.cpp"
  },
  {
-  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/C++/chip8",
   "arguments": [
    "g++",
    "-Wall",
    "-lSDL2",
+   "-g",
    "-c",
    "-Isrc",
    "-o",
@@ -45,26 +64,12 @@
   "file": "src/display.cpp"
  },
  {
-  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
+  "directory": "/home/hoswoo/Desktop/Programming/C++/chip8",
   "arguments": [
    "g++",
    "-Wall",
    "-lSDL2",
-   "-c",
-   "-Isrc",
-   "-o",
-   "build/main.o",
-   "src/main.cpp",
-   "-MMD"
-  ],
-  "file": "src/main.cpp"
- },
- {
-  "directory": "/home/hoswoo/Desktop/Programming/Chip8",
-  "arguments": [
-   "g++",
-   "-Wall",
-   "-lSDL2",
+   "-g",
    "-c",
    "-Isrc",
    "-o",
@@ -73,5 +78,21 @@
    "-MMD"
   ],
   "file": "src/input.cpp"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C++/chip8",
+  "arguments": [
+   "g++",
+   "-Wall",
+   "-lSDL2",
+   "-g",
+   "-c",
+   "-Isrc",
+   "-o",
+   "build/main.o",
+   "src/main.cpp",
+   "-MMD"
+  ],
+  "file": "src/main.cpp"
  }
 ]

@@ -238,6 +238,11 @@ void CPU::execute(uint8_t op){
 				// This is different from the x,y functions defined in Op::, as those extract the bits from the opcode itself.
 				n = opcode & 0x000F;
 				uint8_t px;
+				// Reduce if overflow
+				if (v[x] > 0x3F)
+					v[x] %= DISP_X;
+				if (v[y] > 0x1F)
+					v[y] %= DISP_Y;
 				// dy is the y position of the line being drawn
 				for (int dy = 0; dy < n; dy++){
 					px = mem[this->i + dy];

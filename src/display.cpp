@@ -58,11 +58,11 @@ void Display::RenderGFX(size_t* num_pixels, SDL_Renderer *renderer){
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	RenderPixels(renderer, unset_arr, unset_vect.size());
+    SDL_RenderPresent(renderer);
 }
 
 void Display::RenderPixels(SDL_Renderer* renderer, SDL_Rect* pixel_arr, size_t num_pixels){
 	SDL_RenderFillRects(renderer, pixel_arr, num_pixels);
-    SDL_RenderPresent(renderer);
 }
 
 

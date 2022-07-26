@@ -115,7 +115,7 @@ void ExitChip8(){
 	printf("Exiting... Goodbye!\n");
 	SDL_DestroyWindow(window);
 	SDL_Quit();
-	exit(1);
+	exit(EXIT_SUCCESS);
 }
 
 
