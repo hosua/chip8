@@ -29,4 +29,4 @@ public:
 	void RenderPixels(SDL_Renderer* renderer, SDL_Rect* pixel_arr, size_t num_pixels);
 };
 
-#endif
+#endif // DISPLAY_H

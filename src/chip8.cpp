@@ -79,7 +79,7 @@ const char* Op::optostr(uint8_t op){
 		case ERR: return "ERR";
 		default: return "WTF";
 	}
-	return "UWOTM8";
+	return "ERR";
 }
 
 bool Chip8::LoadROM(const char* rom_path){

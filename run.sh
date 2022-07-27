@@ -47,16 +47,10 @@ fi
 GAMES_DIR="games"
 ls "games" | nl
 
-GAME_PATHS=("$GAMES_DIR"/*)
-
-echo "Enter a number to select the ROM to run"
-read input
-((input=input-1))
-RUN_PATH="${GAME_PATHS[$input]}"
 
 echo $RUN_PATH
 
-cmd="./$EXEC $RUN_PATH"
+cmd="./$EXEC"
 
 if [ $use_gdb == "true" ]; then
 	cmd="$cmd -d $num_cycles"

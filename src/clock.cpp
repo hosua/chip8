@@ -6,9 +6,8 @@
 
 // Global tick counter 
 uint64_t G_ticks_elapsed = 0;
-// TICK is the constant time representing the length of each tick in microseconds. 
 
-// I don't even really know why I implemented my own clock, I just kinda felt like it.
+// TICK is the constant time representing the length of each tick in microseconds. 
 void Clock::tick(){
 	if (high_resolution_clock::now() - tick_start > std::chrono::microseconds(TICK)){
 		G_ticks_elapsed++;		
@@ -22,7 +21,7 @@ void Clock::tick(){
 	}
 }
 
-// Stop calling thread and wait for a specified number of ticks
+// Stop calling thread for specified number of ticks
 void Clock::wait(uint16_t num_ticks){
 	if (VERBOSE_CLOCK) printf("Clock waiting for %i ticks\n", num_ticks);
 	std::this_thread::sleep_for(std::chrono::microseconds(TICK * num_ticks));

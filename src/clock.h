@@ -24,4 +24,4 @@ private:
 	high_resolution_clock::time_point tick_start; // The starting time_point of the current tick
 };
 
-#endif
+#endif // CLOCK_H

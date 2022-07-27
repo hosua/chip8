@@ -3,6 +3,9 @@
 #include <display.h>
 #include <input.h>
 #include <clock.h>
+#include <iostream>
+#include <filesystem>
+
 
 // For parsing CLI args
 #include <getopt.h>
@@ -14,14 +17,6 @@ bool VERBOSE_CPU = false;
 bool VERBOSE_DISPLAY = false;
 bool VERBOSE_INPUT = false;
 
-SDL_Window* window = SDL_CreateWindow("CHIP8", 
-		SDL_WINDOWPOS_CENTERED, 
-		SDL_WINDOWPOS_CENTERED, 
-		SCREEN_X, 
-		SCREEN_Y, 
-		0
-		);
-
 void help_menu(){
 	printf("\nTo run a game, pass the path to the ROM as an argument e.g. ./CHIP8 \"path/to/rom\"\n"
 			"Options:\n"
@@ -31,11 +26,30 @@ void help_menu(){
 			"-h, --help\t\t\tThis help menu\n");
 }
 
+SDL_Window* window;
+
+std::string SelectGame(std::string games_directory){
+	std::vector<std::string> path_vect;
+	int i = 1;
+	for (const auto & entry : std::filesystem::directory_iterator(games_directory)){
+		std::string entry_str = entry.path().string();
+		path_vect.push_back(entry_str);
+		std::cout << i << ") " << entry_str.substr(entry_str.find("/")+1) << std::endl;	
+		i++;
+	}
+	size_t num_games = path_vect.size();
+	int input_selection = 0;
+	while (input_selection < 1 || input_selection > num_games){
+		std::cout << "Enter a number to select a game: " << std::endl;
+		std::cin >> input_selection;
+	}
+	return path_vect[input_selection-1];
+}
+
 int main(int argc, char *argv[]){
 	// The cycle at which the emulator will start on (to make debugging less of a chore)
 	size_t start_frame = 0;
 	int o;
-	std::string rom_str;
 	int opt_index = 0;
 
 	const struct option long_opts[] =
@@ -54,20 +68,21 @@ int main(int argc, char *argv[]){
 				if (optarg == NULL && optind < argc
 						&& argv[optind][0] != '-')
 					optarg = argv[optind++];
-				
+
 				if (optarg) start_frame = std::atoi(optarg);
 				printf("Running chip8 in debug mode...\n");
 				DEBUG_MODE = true;
 				break;
 			case 'v':
 				{
-					// Parse multiple args for v
-					for (int i = optind - 1; i < argc; i++){
+					// Multiple args for one flag is not possible
+					for (int index = optind - 1; index < argc; index++){
 						// If the argument is a flag, break
-						if (argv[i][0] == '-')
+						if (argv[index][0] == '-')
 							break;
 						else {
-							const char* arg = argv[i];
+							const char* arg = argv[index-1];
+							std::cout << arg << std::endl;
 							if (strcmp(arg, "cpu") == 0)
 								VERBOSE_CPU = true;
 							if (strcmp(arg, "clock") == 0)
@@ -97,14 +112,19 @@ int main(int argc, char *argv[]){
 		}
 
 	}
-	// Parse non-option args (This really should only ever be one argument, the path to the ROM.)
-	for (int i = optind; i < argc; i++)
-		rom_str += argv[i];	
 
 	Chip8 chip8;
+	std::string rom_str = SelectGame("games").c_str();
 	const char* rom_path = rom_str.c_str();
 	// SDL Rendering stuff
 	SDL_Renderer* renderer = NULL;
+	window = SDL_CreateWindow("CHIP8", 
+			SDL_WINDOWPOS_CENTERED, 
+			SDL_WINDOWPOS_CENTERED, 
+			SCREEN_X, 
+			SCREEN_Y, 
+			0
+			);
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);

@@ -93,4 +93,4 @@ class Chip8 {
 
 extern Chip8 chip8;
 
-#endif
+#endif // CHIP8_H

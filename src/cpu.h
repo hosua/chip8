@@ -39,4 +39,4 @@ class CPU {
 		
 };
 
-#endif 
+#endif // CPU_H

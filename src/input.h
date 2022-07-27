@@ -21,4 +21,4 @@ namespace InputHandler {
 	uint8_t GetKeyRegister(uint8_t scancode);
 }
 
-#endif
+#endif // INPUT_H
