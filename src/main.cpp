@@ -18,8 +18,7 @@ bool VERBOSE_DISPLAY = false;
 bool VERBOSE_INPUT = false;
 
 void help_menu(){
-	printf("\nTo run a game, pass the path to the ROM as an argument e.g. ./CHIP8 \"path/to/rom\"\n"
-			"Options:\n"
+	printf("Options:\n"
 			"-d, --debug-mode <start_frame>\tEnable step-by-step execution and skip to the specified frame\n"
 			"-v, --verbose <type>\t\tTypes: cpu, clock, display, input\n"
 			"-s, --slow-mode\t\t\tRuns the emulator at a slower speed\n"
@@ -55,12 +54,13 @@ int main(int argc, char *argv[]){
 	const struct option long_opts[] =
 	{
 		{"debug-mode", 	  optional_argument,  0, 'd'},
-		{"verbose",   required_argument,  0, 'v'},
+		{"verbose",   optional_argument,  0, 'v'},
 		{"slow-mode",   no_argument,  0, 's'},
 		{"help",   no_argument,  0, 'h'},
 		{0,0,0,0},
 	};
-	while ((o = getopt_long(argc, argv, "hsv:d::", long_opts, &opt_index)) != -1){
+
+	while ((o = getopt_long(argc, argv, "hsv::d::", long_opts, &opt_index)) != -1){
 		switch (o){
 			// Debug mode
 			case 'd':
@@ -76,25 +76,27 @@ int main(int argc, char *argv[]){
 			case 'v':
 				{
 					// Multiple args for one flag is not possible
-					for (int index = optind - 1; index < argc; index++){
-						// If the argument is a flag, break
-						if (argv[index][0] == '-')
-							break;
-						else {
-							const char* arg = argv[index-1];
-							std::cout << arg << std::endl;
-							if (strcmp(arg, "cpu") == 0)
-								VERBOSE_CPU = true;
-							if (strcmp(arg, "clock") == 0)
-								VERBOSE_CLOCK = true;
-							if (strcmp(arg, "display") == 0)
-								VERBOSE_DISPLAY = true;
-							if (strcmp(arg, "input") == 0)
-								VERBOSE_INPUT = true;
-						}
+					if (optarg == NULL && optind < argc
+							&& argv[optind][0] != '-')
+						optarg = argv[optind++];
+
+					if (optarg == NULL){
+						VERBOSE_CPU = true;
+						VERBOSE_CLOCK = true;
+						VERBOSE_DISPLAY = true;
+						VERBOSE_INPUT = true;
+					} else {
+						if (strcmp(optarg, "cpu") == 0)
+							VERBOSE_CPU = true;
+						if (strcmp(optarg, "clock") == 0)
+							VERBOSE_CLOCK = true;
+						if (strcmp(optarg, "display") == 0)
+							VERBOSE_DISPLAY = true;
+						if (strcmp(optarg, "input") == 0)
+							VERBOSE_INPUT = true;
 					}
-					break;
 				}
+				break;
 			case 's':
 				SLOW_MODE = true;
 				break;

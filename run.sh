@@ -44,9 +44,6 @@ if [ -z "$(ls "$EXEC")" ]; then
 	exit
 fi
 
-GAMES_DIR="games"
-ls "games" | nl
-
 
 echo $RUN_PATH
 
