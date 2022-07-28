@@ -17,6 +17,8 @@ bool VERBOSE_CPU = false;
 bool VERBOSE_DISPLAY = false;
 bool VERBOSE_INPUT = false;
 
+#define DEFAULT_GAMES_DIR "games_dir/games"
+
 void help_menu(){
 	printf("Options:\n"
 			"-d, --debug-mode <start_frame>\tEnable step-by-step execution and skip to the specified frame\n"
@@ -33,7 +35,7 @@ std::string SelectGame(std::string games_directory){
 	for (const auto & entry : std::filesystem::directory_iterator(games_directory)){
 		std::string entry_str = entry.path().string();
 		path_vect.push_back(entry_str);
-		std::cout << i << ") " << entry_str.substr(entry_str.find("/")+1) << std::endl;	
+		std::cout << i << ") " << entry_str.substr(entry_str.find_last_of("/")+1) << std::endl;	
 		i++;
 	}
 	size_t num_games = path_vect.size();
@@ -53,6 +55,7 @@ int main(int argc, char *argv[]){
 
 	const struct option long_opts[] =
 	{
+		{"path", required_argument, 0, 'p'},
 		{"debug-mode", 	  optional_argument,  0, 'd'},
 		{"verbose",   optional_argument,  0, 'v'},
 		{"slow-mode",   no_argument,  0, 's'},
@@ -60,7 +63,9 @@ int main(int argc, char *argv[]){
 		{0,0,0,0},
 	};
 
-	while ((o = getopt_long(argc, argv, "hsv::d::", long_opts, &opt_index)) != -1){
+	std::string rom_str;
+
+	while ((o = getopt_long(argc, argv, "hsp:v::d::", long_opts, &opt_index)) != -1){
 		switch (o){
 			// Debug mode
 			case 'd':
@@ -104,6 +109,10 @@ int main(int argc, char *argv[]){
 				help_menu();
 				exit(0);
 				break;
+			case 'p':
+				// If path flag is passed, use its argument as the rom string
+				rom_str = SelectGame(optarg).c_str();
+				break;
 			case '?':
 				printf("Error parsing arguments.\n");
 				break;
@@ -112,12 +121,15 @@ int main(int argc, char *argv[]){
 				exit(1);
 				break;
 		}
-
 	}
 
+	if (rom_str == "")
+		rom_str = SelectGame(DEFAULT_GAMES_DIR).c_str();
+	
+
 	Chip8 chip8;
-	std::string rom_str = SelectGame("games").c_str();
 	const char* rom_path = rom_str.c_str();
+	std::cout << std::string(rom_path) << std::endl;
 	// SDL Rendering stuff
 	SDL_Renderer* renderer = NULL;
 	window = SDL_CreateWindow("CHIP8", 
