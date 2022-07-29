@@ -31,13 +31,16 @@ SDL_Window* window;
 
 std::string SelectGame(std::string games_directory){
 	std::vector<std::string> path_vect;
-	int i = 1;
 	for (const auto & entry : std::filesystem::directory_iterator(games_directory)){
 		std::string entry_str = entry.path().string();
 		path_vect.push_back(entry_str);
-		std::cout << i << ") " << entry_str.substr(entry_str.find_last_of("/")+1) << std::endl;	
-		i++;
 	}
+	sort(path_vect.begin(), path_vect.end());
+	int i = 1;
+	for (auto itr = path_vect.begin(); itr != path_vect.end(); itr++, i++){
+		std::cout << i << ") " << itr->substr(itr->find_last_of("/")+1) << std::endl;	
+	}
+
 	size_t num_games = path_vect.size();
 	int input_selection = 0;
 	while (input_selection < 1 || input_selection > num_games){
