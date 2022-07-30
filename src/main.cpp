@@ -3,6 +3,7 @@
 #include <display.h>
 #include <input.h>
 #include <clock.h>
+#include <dir_nav.h>
 #include <iostream>
 #include <filesystem>
 
@@ -17,8 +18,6 @@ bool VERBOSE_CPU = false;
 bool VERBOSE_DISPLAY = false;
 bool VERBOSE_INPUT = false;
 
-#define DEFAULT_GAMES_DIR "games_dir/games"
-
 void help_menu(){
 	printf("Options:\n"
 			"-d, --debug-mode <start_frame>\tEnable step-by-step execution and skip to the specified frame\n"
@@ -28,27 +27,6 @@ void help_menu(){
 }
 
 SDL_Window* window;
-
-std::string SelectGame(std::string games_directory){
-	std::vector<std::string> path_vect;
-	for (const auto & entry : std::filesystem::directory_iterator(games_directory)){
-		std::string entry_str = entry.path().string();
-		path_vect.push_back(entry_str);
-	}
-	sort(path_vect.begin(), path_vect.end());
-	int i = 1;
-	for (auto itr = path_vect.begin(); itr != path_vect.end(); itr++, i++){
-		std::cout << i << ") " << itr->substr(itr->find_last_of("/")+1) << std::endl;	
-	}
-
-	size_t num_games = path_vect.size();
-	int input_selection = 0;
-	while (input_selection < 1 || input_selection > num_games){
-		std::cout << "Enter a number to select a game: " << std::endl;
-		std::cin >> input_selection;
-	}
-	return path_vect[input_selection-1];
-}
 
 int main(int argc, char *argv[]){
 	// The cycle at which the emulator will start on (to make debugging less of a chore)
