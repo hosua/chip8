@@ -22,8 +22,6 @@ To render the graphics, I am using SDL 2.0.
 
 For extra debugging commands, run ``./CHIP8 --help``. (Windows users can do this by running ``./CHIP8.exe --help`` in CMD or powerhell)
 
-and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for example.
-
 ![opcode-test](images/opcode_test.png)
 ![invaders](images/invaders.gif)
 ![pong](images/pong.gif)
