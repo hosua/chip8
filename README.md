@@ -1,38 +1,28 @@
 **This is still a work in progress**
 
 # Issues
-Timing is broken
+Timing is broken on some games, and input is awkward on games that wait for input (i.e. Tetris)
+
+Flickering exists due to the inherent way the CHIP-8 displays graphics. Reducing the flickering will deviate from true emulator
+accuracy, but it would look more presentable.
 
 Sound is not implemented
 
-Some games work relatively well right now, most are still broken to some extent.
+Most games almost fully work, but there is definitely some incorrect implementation(s) somewhere.
 
 # How to use
 
-If you want to try running this emulator...
+If you are on Linux, you will have to compile this from source. I used the SDL 2.0 libraries to render graphics, so you will need those libraries installed for your respective distro.
 
-From the ``run.sh`` script help menu:
-```
--c Compile Chip8 with make
--d Delete all build files (including executable) with make clean
--g Run in debug mode with gdb
--e Exit
--k Force kill CHIP8 
--y Compile with compiledb script for YCM syntax completion/checking
--t Run optest
--h This help menu
-```
-If you run this script without arguments, it will let you select a game and run the CHIP8 emulator. 
-You must compile it with the -c flag first for it to work.
+If you are on Windows, the binary files are provided in the ``Windows`` directory. If you wish to compile this from source, you will need to figure out how to download the SDL 2.0 libraries on Windows. For more details, you can view my [TetriC README](https://github.com/hosua/TetriC#compiling-on-windows) on how to install the SDL 2.0 libraries on Windows. 
 
-If you cannot use the ``run.sh`` script for whatever reason, you can compile the program with ``make``,
-and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for example.
-
-The emulator has some flags that you can pass for certain features. These are all basically implemented to
-make debugging easier. If you want to use them, see the chip8 help menu by running ``./CHIP8 -h``
-
+Simply run ``./CHIP8`` if running on Linux, or run ``CHIP8.exe`` on Windows.
 
 To render the graphics, I am using SDL 2.0.
+
+For extra debugging commands, run ``./CHIP8 --help``. (Windows users can do this by running ``./CHIP8.exe --help`` in CMD or powerhell)
+
+and then run it with ``./CHIP8 "games/IBM"``, to run the IBM test ROM for example.
 
 ![opcode-test](images/opcode_test.png)
 ![invaders](images/invaders.gif)

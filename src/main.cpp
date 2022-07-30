@@ -21,7 +21,7 @@ bool VERBOSE_INPUT = false;
 void help_menu(){
 	printf("Options:\n"
 			"-d, --debug-mode <start_frame>\tEnable step-by-step execution and skip to the specified frame\n"
-			"-v, --verbose <type>\t\tTypes: cpu, clock, display, input\n"
+			"-v, --verbose <type>\t\tTypes: cpu clock display input (Can only take one parameter)\n"
 			"-s, --slow-mode\t\t\tRuns the emulator at a slower speed\n"
 			"-h, --help\t\t\tThis help menu\n");
 }

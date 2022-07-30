@@ -25,9 +25,6 @@ std::string SelectGame(std::string games_directory){
 		// If a directory
 			std::transform(itr->begin(), itr->end(), itr->begin(), ::toupper);
 			std::cout << itr->substr(itr->substr(0, itr->size()-1).find_last_of("/")+1) << std::endl;
-			// Don't count directory
-			// i--; 
-			path_vect.erase(itr);
 		}
 	}
 

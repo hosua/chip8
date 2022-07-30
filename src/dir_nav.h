@@ -11,5 +11,4 @@
 
 std::string SelectGame(std::string games_directory);
 
-
 #endif // DIR_NAV_H
