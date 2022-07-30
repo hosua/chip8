@@ -1,0 +1,1058 @@
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.3
+ 
+# Built for x86_64-pc-msys
+ 
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+ 
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+ 
+# This is free software: you are free to change and redistribute it.
+ 
+# There is NO WARRANTY, to the extent permitted by law.
+ 
+
+ 
+# Make data base, printed on Sat Jul 30 02:27:42 2022
+ 
+
+ 
+# Variables
+ 
+
+ 
+# environment
+ 
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
+ 
+# environment
+ 
+SYSTEMDRIVE = C:
+ 
+# environment
+ 
+LC_ALL = C
+ 
+# environment
+ 
+USERPROFILE = C:\Users\Hosua
+ 
+# environment
+ 
+LOCALAPPDATA = C:\Users\Hosua\AppData\Local
+ 
+# makefile (from 'Makefile', line 21)
+VPATH = $(SOURCEDIR)
+# environment
+VSCODE_CWD = C:\Users\Hosua\Desktop\Github\chip8
+# environment
+SYSTEMROOT = C:\Windows
+# makefile (from 'Makefile', line 10)
+VERBOSE = TRUE
+# environment
+PROCESSOR_LEVEL = 25
+# environment
+PSMODULEPATH = C:\Users\Hosua\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+ 
+# default
+ 
+MAKE_COMMAND := make
+ 
+# automatic
+ 
+@D = $(patsubst %/,%,$(dir $@))
+ 
+# environment
+ 
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_5860_PEKOYIREWKDFIRBJ
+ 
+# makefile (from 'Makefile', line 54)
+ 
+PSEP = $(strip $(SEP))
+ 
+# environment
+ 
+FPS_BROWSER_USER_PROFILE_STRING = Default
+ 
+# environment
+ 
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+ 
+# default
+ 
+.VARIABLES := 
+ 
+# automatic
+ 
+%D = $(patsubst %/,%,$(dir $%))
+ 
+# automatic
+ 
+^D = $(patsubst %/,%,$(dir $^))
+ 
+# automatic
+ 
+%F = $(notdir $%)
+ 
+# environment
+ 
+VSCODE_CODE_CACHE_PATH = C:\Users\Hosua\AppData\Roaming\Code\CachedData\3b889b090b5ad5793f524b5d1d39fda662b96a2a
+ 
+# environment
+ 
+LANG = C
+ 
+# default
+ 
+.LOADED := 
+ 
+# environment
+ 
+TMP = /c/Users/Hosua/AppData/Local/Temp
+ 
+# default
+ 
+.INCLUDE_DIRS = /usr/include /usr/include
+ 
+# makefile
+ 
+MAKEFLAGS = pqrR
+ 
+# environment
+ 
+ONEDRIVE = C:\Users\Hosua\OneDrive
+ 
+# makefile (from 'Makefile', line 3)
+ 
+SOURCEDIR := src
+ 
+# makefile
+ 
+CURDIR := /c/Users/Hosua/Desktop/Github/chip8
+ 
+# makefile (from 'Makefile', line 41)
+ 
+RMDIR = -RMDIR /S /Q
+ 
+# environment
+ 
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+ 
+# makefile (from 'Makefile', line 64)
+ 
+define generateRules
+ 
+$(1)/%.o: %.cpp
+ 
+	$(HIDE)@echo Building $$@
+ 
+	$(CC) $(CFLAGS) -c $$(INCLUDES) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD
+ 
+endef
+ 
+# automatic
+ 
+*D = $(patsubst %/,%,$(dir $*))
+ 
+# environment
+ 
+PROGRAMFILES = C:\Program Files
+ 
+# environment
+ 
+MFLAGS = -pqrR
+ 
+# default
+ 
+.SHELLFLAGS := -c
+ 
+# environment
+ 
+!C: = c:\Users\Hosua\Desktop\Github\chip8
+ 
+# makefile (from 'Makefile', line 58)
+ 
+HIDE = 
+ 
+# environment
+ 
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+ 
+# automatic
+ 
++D = $(patsubst %/,%,$(dir $+))
+ 
+# makefile (from 'build/main.d', line 1)
+ 
+MAKEFILE_LIST := Makefile build/chip8.d build/clock.d build/cpu.d build/display.d build/input.d build/main.d
+ 
+# automatic
+ 
+@F = $(notdir $@)
+ 
+# makefile (from 'Makefile', line 2)
+ 
+PROJDIR := /c/Users/Hosua/Desktop/Github/chip8
+ 
+# environment
+ 
+VSCODE_PID = 5860
+ 
+# automatic
+ 
+?D = $(patsubst %/,%,$(dir $?))
+ 
+# makefile (from 'Makefile', line 18)
+ 
+INCLUDES = $(foreach dir, $(SOURCEDIR), $(addprefix -I, $(dir)))
+ 
+# automatic
+ 
+*F = $(notdir $*)
+ 
+# makefile (from 'Makefile', line 43)
+ 
+ERRIGNORE = 2>NUL || true
+ 
+# automatic
+ 
+<D = $(patsubst %/,%,$(dir $<))
+ 
+# environment
+ 
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+ 
+# default
+ 
+MAKE_HOST := x86_64-pc-msys
+ 
+# makefile (from 'Makefile', line 27)
+ 
+OBJS := build/chip8.o build/clock.o build/cpu.o build/display.o build/input.o build/main.o
+ 
+# environment
+ 
+PROGRAMDATA = C:\ProgramData
+ 
+# default
+ 
+SHELL := /bin/sh
+ 
+# environment
+ 
+HOMEPATH = \Users\Hosua
+ 
+# default
+ 
+MAKECMDGOALS := all
+ 
+# environment
+ 
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+ 
+# environment
+ 
+COMSPEC = C:\Windows\system32\cmd.exe
+ 
+# environment
+ 
+WINDIR = C:\Windows
+ 
+# environment
+ 
+MAKELEVEL := 0
+ 
+# makefile (from 'Makefile', line 42)
+ 
+MKDIR = -mkdir
+ 
+# default
+ 
+MAKE = $(MAKE_COMMAND)
+ 
+# environment
+ 
+PATH = /c/Windows/system32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Windows/System32/OpenSSH:/c/Users/Hosua/AppData/Local/Microsoft/WindowsApps:/mingw64/bin:/c/Program Files/Vim/vim82:/c/Program Files (x86)/Vim/vim82:/c/Users/Hosua/AppData/Local/Programs/Microsoft VS Code:/c/Program Files/Git/cmd:/usr/bin:/c/Users/Hosua/AppData/Local/Programs/Python/Python310/Scripts:/c/Users/Hosua/AppData/Local/Programs/Python/Python310:/c/Users/Hosua/AppData/Local/Microsoft/WindowsApps:/c/Users/Hosua/AppData/Local/Programs/Microsoft VS Code/bin
+ 
+# environment
+ 
+COMPUTERNAME = DESKTOP-4V5VLQ2
+ 
+# default
+ 
+MAKEFILES := 
+ 
+# automatic
+ 
+^F = $(notdir $^)
+ 
+# environment
+ 
+PROMPT = $P$G
+ 
+# environment
+ 
+LOGONSERVER = \\DESKTOP-4V5VLQ2
+ 
+# environment
+ 
+USERNAME = Hosua
+ 
+# environment
+ 
+COMMONPROGRAMFILES = C:\Program Files\Common Files
+ 
+# automatic
+ 
+?F = $(notdir $?)
+ 
+# environment
+ 
+PROGRAMW6432 = C:\Program Files
+ 
+# environment
+ 
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+ 
+# automatic
+ 
++F = $(notdir $+)
+ 
+# environment
+ 
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+ 
+# environment
+ 
+USERDOMAIN = DESKTOP-4V5VLQ2
+ 
+# 'override' directive
+ 
+GNUMAKEFLAGS := 
+ 
+# environment
+ 
+OS = Windows_NT
+ 
+# makefile
+ 
+.DEFAULT_GOAL := all
+ 
+# makefile (from 'Makefile', line 40)
+ 
+RM = del /F /Q 
+ 
+# default
+ 
+MAKE_VERSION := 4.3
+ 
+# environment
+ 
+PROGRAMFILES(X86) = C:\Program Files (x86)
+ 
+# environment
+ 
+USERDOMAIN_ROAMINGPROFILE = DESKTOP-4V5VLQ2
+ 
+# environment
+ 
+NUMBER_OF_PROCESSORS = 1
+ 
+# environment
+ 
+PUBLIC = C:\Users\Public
+ 
+# environment
+ 
+APPDATA = C:\Users\Hosua\AppData\Roaming
+ 
+# makefile (from 'Makefile', line 33)
+ 
+CFLAGS = -Wall -lSDL2 -g -lstdc++fs -std=c++1z
+ 
+# environment
+ 
+HOMEDRIVE = C:
+ 
+# environment
+ 
+PROCESSOR_ARCHITECTURE = AMD64
+ 
+# makefile (from 'Makefile', line 15)
+ 
+TARGETDIRS = $(BUILDDIR)
+ 
+# environment
+ 
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+ 
+# environment
+ 
+HOME = /home/Hosua
+ 
+# environment
+ 
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+ 
+# environment
+ 
+ELECTRON_RUN_AS_NODE = 1
+ 
+# environment
+ 
+TEMP = /c/Users/Hosua/AppData/Local/Temp
+ 
+# environment
+ 
+VSCODE_IPC_HOOK = \\.\pipe\dda8f4d0c5b470730e1373ba3b351fbc-1.69.2-main-sock
+ 
+# environment
+ 
+TERM = xterm-256color
+ 
+# default
+ 
+.RECIPEPREFIX := 
+ 
+# automatic
+ 
+<F = $(notdir $<)
+ 
+# makefile (from 'Makefile', line 30)
+ 
+DEPS = $(OBJS:.o=.d)
+ 
+# default
+ 
+SUFFIXES := 
+ 
+# environment
+ 
+ALLUSERSPROFILE = C:\ProgramData
+ 
+# makefile (from 'Makefile', line 7)
+ 
+TARGET = CHIP8
+ 
+# environment
+ 
+SESSIONNAME = Console
+ 
+# default
+ 
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+ 
+# environment
+ 
+PROCESSOR_REVISION = 2100
+ 
+# makefile (from 'Makefile', line 36)
+ 
+CC = g++
+ 
+# makefile (from 'Makefile', line 4)
+ 
+BUILDDIR := build
+ 
+# makefile (from 'Makefile', line 24)
+ 
+SOURCES = $(wildcard $(SOURCEDIR)/*.cpp)
+ 
+# makefile (from 'Makefile', line 44)
+ 
+SEP = \\
+ 
+# environment
+ 
+PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 33 Stepping 0, AuthenticAMD
+ 
+# variable set hash-table stats:
+ 
+# Load=112/1024=11%, Rehash=0, Collisions=13/180=7%
+ 
+
+ 
+# Pattern-specific Variable Values
+ 
+
+ 
+# No pattern-specific variable values.
+ 
+
+ 
+# Directories
+ 
+
+ 
+# src (device 1657597624, inode 281474977244547): 13 files, no impossibilities.
+ 
+# . (device 1657597624, inode 281474977242803): 19 files, no impossibilities.
+ 
+
+ 
+# 32 files, no impossibilities in 2 directories.
+ 
+
+ 
+# Implicit Rules
+ 
+
+ 
+build/%.o: %.cpp
+ 
+#  recipe to execute (from 'Makefile', line 82):
+ 
+	@echo Building $@
+ 
+	g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z -c $(INCLUDES) -o $(subst /,$(PSEP),$@) $(subst /,$(PSEP),$<) -MMD
+ 
+
+ 
+# 1 implicit rules, 0 (0.0%) terminal.
+ 
+# Files
+ 
+
+ 
+# Not a target:
+ 
+src\chip8.cpp:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src\main.cpp:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src/input.h:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/clock.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-30 02:09:56.8693989
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+build\cpu.o: src\cpu.cpp src/cpu.h src/chip8.h src/clock.h src/input.h
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src/clock.h:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src\input.cpp:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+Makefile:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-30 02:07:19.6791422
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+# Not a target:
+ 
+src\clock.cpp:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/cpu.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-30 02:09:59.0071771
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+# Not a target:
+ 
+build/clock.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/chip8.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+clean:
+ 
+#  Phony target (prerequisite of .PHONY).
+ 
+#  Implicit rule search has not been done.
+ 
+#  File does not exist.
+ 
+#  File has not been updated.
+ 
+#  recipe to execute (from 'Makefile', line 89):
+ 
+	$(RMDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
+ 
+	$(RM) $(TARGET) $(ERRIGNORE)
+ 
+	@echo Cleaning done ! 
+ 
+
+ 
+# Not a target:
+ 
+src/cpu.h:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+CHIP8: build/chip8.o build/clock.o build/cpu.o build/display.o build/input.o build/main.o
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+#  recipe to execute (from 'Makefile', line 75):
+ 
+	$(HIDE)@echo Linking $@
+ 
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
+ 
+
+ 
+# Not a target:
+ 
+src/display.h:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/input.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+build\main.o: src\main.cpp src/chip8.h src/cpu.h src/clock.h src/display.h src/input.h
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/display.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/chip8.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-30 02:09:54.2379102
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+# Not a target:
+ 
+.DEFAULT:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src/chip8.h:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/cpu.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+all: directories CHIP8
+ 
+#  Phony target (prerequisite of .PHONY).
+ 
+#  Command line target.
+ 
+#  Implicit rule search has not been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Needs to be updated (-q is set).
+ 
+# variable set hash-table stats:
+ 
+# Load=0/32=0%, Rehash=0, Collisions=0/9=0%
+ 
+
+ 
+# Not a target:
+ 
+build/input.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-30 02:10:03.0462527
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+# Not a target:
+ 
+build/display.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-30 02:10:00.9449448
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+build\clock.o: src\clock.cpp src/clock.h src/chip8.h src/input.h
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/main.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-30 02:10:05.3947972
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+build\display.o: src\display.cpp src/chip8.h src/display.h src/cpu.h src/clock.h
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src\cpu.cpp:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+directories:
+ 
+#  Phony target (prerequisite of .PHONY).
+ 
+#  Implicit rule search has not been done.
+ 
+#  Implicit/static pattern stem: ''
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Needs to be updated (-q is set).
+ 
+# automatic
+ 
+# @ := directories
+ 
+# automatic
+ 
+# * := 
+ 
+# automatic
+ 
+# < := 
+ 
+# automatic
+ 
+# + := 
+ 
+# automatic
+ 
+# % := 
+ 
+# automatic
+ 
+# ^ := 
+ 
+# automatic
+ 
+# ? := 
+ 
+# automatic
+ 
+# | := 
+ 
+# variable set hash-table stats:
+ 
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+ 
+#  recipe to execute (from 'Makefile', line 85):
+ 
+	$(MKDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
+ 
+
+ 
+build\input.o: src\input.cpp src/input.h src/chip8.h src/display.h src/cpu.h src/clock.h
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src\display.cpp:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+.SUFFIXES:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+build/main.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+.PHONY: all clean directories
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+build\chip8.o: src\chip8.cpp src/chip8.h src/display.h src/cpu.h src/clock.h
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# files hash-table stats:
+ 
+# Load=37/1024=4%, Rehash=0, Collisions=0/100=0%
+ 
+# VPATH Search Paths
+ 
+
+ 
+# No 'vpath' search paths.
+ 
+
+ 
+# General ('VPATH' variable) search path:
+ 
+# src
+ 
+
+ 
+# strcache buffers: 1 (0) / strings = 70 / storage = 739 B / avg = 10 B
+ 
+# current buf: size = 8162 B / used = 739 B / count = 70 / avg = 10 B
+ 
+
+ 
+# strcache performance: lookups = 122 / hit rate = 42%
+ 
+# hash-table stats:
+ 
+# Load=70/8192=1%, Rehash=0, Collisions=0/122=0%
+ 
+# Finished Make data base on Sat Jul 30 02:27:42 2022
+ 
+
+ 

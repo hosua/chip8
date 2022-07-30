@@ -1,0 +1,35 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/c/Users/Hosua/Desktop/Github/chip8'
+ 
+mkdir build 2>NUL || true
+ 
+echo Building build/chip8.o
+ 
+g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z -c  -Isrc -o build\\chip8.o src\\chip8.cpp -MMD
+ 
+echo Building build/clock.o
+ 
+g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z -c  -Isrc -o build\\clock.o src\\clock.cpp -MMD
+ 
+echo Building build/cpu.o
+ 
+g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z -c  -Isrc -o build\\cpu.o src\\cpu.cpp -MMD
+ 
+echo Building build/display.o
+ 
+g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z -c  -Isrc -o build\\display.o src\\display.cpp -MMD
+ 
+echo Building build/input.o
+ 
+g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z -c  -Isrc -o build\\input.o src\\input.cpp -MMD
+ 
+echo Building build/main.o
+ 
+g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z -c  -Isrc -o build\\main.o src\\main.cpp -MMD
+ 
+echo Linking CHIP8
+ 
+g++ -Wall -lSDL2 -g -lstdc++fs -std=c++1z build/chip8.o build/clock.o build/cpu.o build/display.o build/input.o build/main.o -o CHIP8
+ 
+make: Leaving directory '/c/Users/Hosua/Desktop/Github/chip8'
+ 
