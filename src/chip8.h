@@ -67,7 +67,7 @@ namespace Op {
 class Chip8 {
 	public:
 		uint8_t mem[MEM_SIZE] = {0}; // mem of the chip8
-		uint8_t gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
+		bool gfx[DISP_X * DISP_Y] = {0}; // 64x32 display
 		bool keys[NUM_KEYS] = {0}; // array of all keys from 0-F, 1 if pressed, 0 if unpressed
 		bool draw_flag = false; // draw flag
 

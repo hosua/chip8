@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <filesystem>
+#include <fstream>
 #include <algorithm>
 
 #define DEFAULT_GAMES_DIR "GAMES"

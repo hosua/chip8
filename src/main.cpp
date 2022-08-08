@@ -29,7 +29,7 @@ void help_menu(){
 SDL_Window* window;
 
 int main(int argc, char *argv[]){
-	// The cycle at which the emulator will start on (to make debugging less of a chore)
+	// The cycle at which the emulator will start on (to make debugging less of a hassle)
 	size_t start_frame = 0;
 	int o;
 	int opt_index = 0;

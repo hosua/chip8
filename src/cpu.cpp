@@ -236,17 +236,18 @@ void CPU::execute(uint8_t op){
 				v[0xF] = 0;
 				// Here, we need to get the actual values from the V registers 
 				// This is different from the x,y functions defined in Op::, as those extract the bits from the opcode itself.
-				n = opcode & 0x000F;
 				uint8_t px;
 				// Reduce if overflow
 				if (v[x] > DISP_X) v[x] %= DISP_X;
 				if (v[y] > DISP_Y) v[y] %= DISP_Y;
 
-				// dy is the y position of the line being drawn
+				// dy and dx are the positions of the line being drawn, relative to their V value counterparts.
 				for (int dy = 0; dy < n; dy++){
+
+					// px = mem[this->i + dy];
 					px = mem[this->i + dy];
 					for(int dx = 0; dx < 8; dx++){
-						// dx is the x position of the pixel in the line being drawn
+
 						if(px & (0x80 >> dx)){
 							// and if gfx is set
 							if(chip8->gfx[(v[x] + dx + ((v[y] + dy) * DISP_X))]){
@@ -290,7 +291,7 @@ void CPU::execute(uint8_t op){
 								break;
 							case 0x000A: // Fx0A - LD Vx, K
 								description = "Vx, K";
-								v[x] = InputHandler::WaitForKeyPress();
+								v[x] = key_map[InputHandler::WaitForKeyPress()];
 								break;
 							case 0x0015: // Fx15 - LD DT, Vx
 								description = "DT, Vx";

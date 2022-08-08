@@ -50,7 +50,7 @@ uint16_t Op::nnn(size_t opcode){
 }
 // n or nibble - A 4-bit value, the lowest 4 bits of the instruction
 uint8_t Op::n(uint16_t opcode){
-	return (opcode	& 0x000F);
+	return (opcode & 0x000F);
 }
 
 const char* Op::optostr(uint8_t op){

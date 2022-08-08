@@ -21,4 +21,6 @@ namespace InputHandler {
 	uint8_t GetKeyRegister(uint8_t scancode);
 }
 
+extern std::map<uint8_t, uint8_t> key_map;
+
 #endif // INPUT_H
