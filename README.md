@@ -1,5 +1,3 @@
-**This is still a work in progress**
-
 # Issues
 Timing is broken on some games, and input is awkward on games that wait for input (i.e. Tetris)
 
@@ -8,7 +6,7 @@ accuracy, but it would look more presentable.
 
 Sound is not implemented
 
-Most games almost fully work, but there is definitely some incorrect implementation(s) somewhere.
+Most games almost fully work, but not all.
 
 # How to use
 
