@@ -16,8 +16,6 @@ If you are on Windows, the binary files are provided in the ``Windows`` director
 
 Simply run ``./CHIP8`` if running on Linux, or run ``CHIP8.exe`` on Windows.
 
-To render the graphics, I am using SDL 2.0.
-
 For extra debugging commands, run ``./CHIP8 --help``. (Windows users can do this by running ``./CHIP8.exe --help`` in CMD or powerhell)
 
 ![opcode-test](images/opcode_test.png)
