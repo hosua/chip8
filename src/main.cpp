@@ -118,10 +118,12 @@ int main(int argc, char *argv[]){
 			SDL_WINDOWPOS_CENTERED, 
 			SCREEN_X, 
 			SCREEN_Y, 
-			0
-			);
+			SDL_WINDOW_RESIZABLE
+		);
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	// Resolution-independent scaling
+	SDL_RenderSetLogicalSize(renderer, SCREEN_X, SCREEN_Y);
 	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 	if (SDL_Init(SDL_INIT_EVERYTHING)){
